@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Cormorant_Garamond, Inter } from "next/font/google";
 import { BRAND } from "@/config/brand";
 import { buildJsonLd, getSiteUrl } from "@/lib/seo";
+import { LoadingScreen } from "@/components/LoadingScreen";
 import "./globals.css";
 
 const cormorant = Cormorant_Garamond({
@@ -78,7 +79,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           />
         ))}
       </head>
-      <body className="bg-background font-sans text-ivory antialiased">{children}</body>
+      <body className="bg-background font-sans text-ivory antialiased">
+        <LoadingScreen />
+        {children}
+      </body>
     </html>
   );
 }

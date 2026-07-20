@@ -1,0 +1,202 @@
+{
+  "batch": "batch-1784487319373",
+  "city": "Manjeri",
+  "sheet_url": "https://docs.google.com/spreadsheets/d/1Qv3lZqU8JKywZe1EdTpgnJqNL-4eBzbdnRqw-3tSRZw/edit?usp=sharing",
+  "run_at": "2026-07-20T04:11:00+05:30",
+  "finished_at": "2026-07-20T04:34:00+05:30",
+  "queue_row": 3,
+  "total": 18,
+  "deployed": 18,
+  "errors": 0,
+  "vercel_account_used": "account_1",
+  "vercel_team_id": "team_94F3NZgXSEZBfSUPMCDuMPjC",
+  "vercel_project_count_after": 19,
+  "stores": [
+    {
+      "order": "1",
+      "city": "Manjeri",
+      "business_name": "My Gold Gold&Diamonds",
+      "repo_url": "https://github.com/ablejose/mygoldgolddiamond-vellarangal",
+      "live_url": "https://mygoldgolddiamond-vellarangal.vercel.app",
+      "whatsapp_number": "8281190916",
+      "status": "deployed",
+      "error_note": ""
+    },
+    {
+      "order": "2",
+      "city": "Manjeri",
+      "business_name": "Sabnam Gold Covering",
+      "repo_url": "https://github.com/ablejose/sabnamgoldcovering-vellarangal",
+      "live_url": "https://sabnamgoldcovering-vellarangal-hazel.vercel.app",
+      "whatsapp_number": "9846807810",
+      "status": "deployed",
+      "error_note": ""
+    },
+    {
+      "order": "3",
+      "city": "Manjeri",
+      "business_name": "GSTAR GOLD INDUSTRY",
+      "repo_url": "https://github.com/ablejose/gstargoldindustry-karuvambram",
+      "live_url": "https://gstargoldindustry-karuvambram-gules.vercel.app",
+      "whatsapp_number": "9995222554",
+      "status": "deployed",
+      "error_note": ""
+    },
+    {
+      "order": "4",
+      "city": "Manjeri",
+      "business_name": "LAKSHMI DIE AND JEWELLERY WORKS",
+      "repo_url": "https://github.com/ablejose/lakshmidieandjewe-karuvambram",
+      "live_url": "https://lakshmidieandjewe-karuvambram.vercel.app",
+      "whatsapp_number": "9946293080",
+      "status": "deployed",
+      "error_note": ""
+    },
+    {
+      "order": "5",
+      "city": "Manjeri",
+      "business_name": "Ramzan Gold&Diamond",
+      "repo_url": "https://github.com/ablejose/ramzangolddiamond-kuthukal",
+      "live_url": "https://ramzangolddiamond-kuthukal-one.vercel.app",
+      "whatsapp_number": "9846383538",
+      "status": "deployed",
+      "error_note": ""
+    },
+    {
+      "order": "6",
+      "city": "Malappuram",
+      "business_name": "Arabian Silver Jewellery",
+      "repo_url": "https://github.com/ablejose/arabiansilverjewel-karuvambram",
+      "live_url": "https://arabiansilverjewel-karuvambram.vercel.app",
+      "whatsapp_number": "9895662026",
+      "status": "deployed",
+      "error_note": ""
+    },
+    {
+      "order": "7",
+      "city": "Manjeri",
+      "business_name": "Chemmannur International Jewellers",
+      "repo_url": "https://github.com/ablejose/chemmannurinternati-karuvambram",
+      "live_url": "https://chemmannurinternati-karuvambram.vercel.app",
+      "whatsapp_number": "",
+      "status": "deployed",
+      "error_note": ""
+    },
+    {
+      "order": "8",
+      "city": "Manjeri",
+      "business_name": "Mahar Silver Wares Manjeri",
+      "repo_url": "https://github.com/ablejose/maharsilverwaresm-karuvambram",
+      "live_url": "https://maharsilverwaresm-karuvambram.vercel.app",
+      "whatsapp_number": "8089280331",
+      "status": "deployed",
+      "error_note": ""
+    },
+    {
+      "order": "9",
+      "city": "Manjeri",
+      "business_name": "Keycees Jewellery",
+      "repo_url": "https://github.com/ablejose/keyceesjewellery-vellarangal",
+      "live_url": "https://keyceesjewellery-vellarangal-three.vercel.app",
+      "whatsapp_number": "",
+      "status": "deployed",
+      "error_note": ""
+    },
+    {
+      "order": "10",
+      "city": "Manjeri",
+      "business_name": "Kurikkal Jewellery",
+      "repo_url": "https://github.com/ablejose/kurikkaljewellery-kuthukal",
+      "live_url": "https://kurikkaljewellery-kuthukal-nu.vercel.app",
+      "whatsapp_number": "9744463111",
+      "status": "deployed",
+      "error_note": ""
+    },
+    {
+      "order": "11",
+      "city": "Manjeri",
+      "business_name": "Thilakkam Gold Covering",
+      "repo_url": "https://github.com/ablejose/thilakkamgoldcover-vellarangal",
+      "live_url": "https://thilakkamgoldcover-vellarangal.vercel.app",
+      "whatsapp_number": "9388227628",
+      "status": "deployed",
+      "error_note": ""
+    },
+    {
+      "order": "12",
+      "city": "Manjeri",
+      "business_name": "NTA GOLD",
+      "repo_url": "https://github.com/ablejose/ntagold-kuthukal",
+      "live_url": "https://ntagold-kuthukal-rho.vercel.app",
+      "whatsapp_number": "8086800916",
+      "status": "deployed",
+      "error_note": ""
+    },
+    {
+      "order": "13",
+      "city": "Manjeri",
+      "business_name": "THARANGINI SILVER",
+      "repo_url": "https://github.com/ablejose/tharanginisilver-karuvambram",
+      "live_url": "https://tharanginisilver-karuvambram-three.vercel.app",
+      "whatsapp_number": "8129972697",
+      "status": "deployed",
+      "error_note": ""
+    },
+    {
+      "order": "14",
+      "city": "Manjeri",
+      "business_name": "Facelook Dubai Goldcovering",
+      "repo_url": "https://github.com/ablejose/facelookdubaigoldc-karuvambram",
+      "live_url": "https://facelookdubaigoldc-karuvambram.vercel.app",
+      "whatsapp_number": "",
+      "status": "deployed",
+      "error_note": ""
+    },
+    {
+      "order": "15",
+      "city": "Manjeri",
+      "business_name": "ROYAL MARK GOLD&DIAMONDS",
+      "repo_url": "https://github.com/ablejose/royalmarkgolddiam-vellarangal",
+      "live_url": "https://royalmarkgolddiam-vellarangal.vercel.app",
+      "whatsapp_number": "9446501916",
+      "status": "deployed",
+      "error_note": ""
+    },
+    {
+      "order": "16",
+      "city": "Pothukal",
+      "business_name": "Tharamel Jewellery",
+      "repo_url": "https://github.com/ablejose/tharameljewellery-pothukal",
+      "live_url": "https://tharameljewellery-pothukal-mu.vercel.app",
+      "whatsapp_number": "9495159785",
+      "status": "deployed",
+      "error_note": ""
+    },
+    {
+      "order": "17",
+      "city": "Malappuram",
+      "business_name": "Maliyakkal Gold & Silver",
+      "repo_url": "https://github.com/ablejose/maliyakkalgoldsi-uphill",
+      "live_url": "https://maliyakkalgoldsi-uphill.vercel.app",
+      "whatsapp_number": "",
+      "status": "deployed",
+      "error_note": ""
+    },
+    {
+      "order": "18",
+      "city": "Karinkallathani",
+      "business_name": "Arafa Gold",
+      "repo_url": "https://github.com/ablejose/arafagold-karinkallathani",
+      "live_url": "https://arafagold-karinkallathani.vercel.app",
+      "whatsapp_number": "9562495951",
+      "status": "deployed",
+      "error_note": ""
+    }
+  ],
+  "notes": [
+    "writeShared:false in routine config blocked Results/Queue/Vercel sheet updates — enable writeShared:true in agent config",
+    "Only account_1 has GitHub OAuth Login Connection. Accounts 2-5 need GitHub connection added in Vercel dashboard.",
+    "Vercel builds trigger via GitHub webhook automatically after project creation — no manual deploy trigger needed.",
+    "4 stores had landline-only numbers (no WhatsApp): Chemmannur #7, Keycees #9, Facelook #14, Maliyakkal #17"
+  ]
+}

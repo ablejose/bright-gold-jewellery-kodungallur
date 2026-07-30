@@ -16,7 +16,7 @@ export const BRAND: BrandConfig = {
   favicon: "/favicon.ico",
 
   heroVideo:
-    "https://res.cloudinary.com/fylz5e3j/video/upload/v1782936959/VN20260702_013328_tbexfn.mp4",
+    "https://res.cloudinary.com/apvcphao/video/upload/v1785387729/VN20260702_013328_tbexfn.mp4",
 
   storyVideos: [
     {
@@ -24,7 +24,7 @@ export const BRAND: BrandConfig = {
       description:
         "അണിയാൻ തീരെ ഭാരമില്ലാത്ത, എന്നാൽ കണ്ണഞ്ചിപ്പിക്കുന്ന ഡിസൈനുകൾ. നിങ്ങളുടെ ഓരോ സാധാരണ ദിവസത്തെയും മനോഹരമാക്കാൻ ഇവ മതിയാകും.",
       video:
-        "https://res.cloudinary.com/fylz5e3j/video/upload/v1782936959/VN20260702_013328_tbexfn.mp4",
+        "https://res.cloudinary.com/apvcphao/video/upload/v1785387729/VN20260702_013328_tbexfn.mp4",
       segments: { startAt: 0, loopEnd: 8 },
     },
     {
@@ -32,7 +32,7 @@ export const BRAND: BrandConfig = {
       description:
         "ഓരോ ആഭരണവും ഓരോ കലാരൂപമാണ്. അതിസൂക്ഷ്മമായി, തികഞ്ഞ പൂർണ്ണതയോടെ രൂപപ്പെടുത്തിയെടുത്തവ. നിങ്ങളുടെ സ്വപ്നങ്ങൾക്ക് സ്വർണ്ണത്തിൽ ജീവൻ വയ്ക്കുമ്പോൾ.",
       video:
-        "https://res.cloudinary.com/fylz5e3j/video/upload/v1782936959/VN20260702_013328_tbexfn.mp4",
+        "https://res.cloudinary.com/apvcphao/video/upload/v1785387729/VN20260702_013328_tbexfn.mp4",
       segments: { startAt: 32, loopEnd: 40 },
     },
     {
@@ -40,7 +40,7 @@ export const BRAND: BrandConfig = {
       description:
         "ഈ നാടിൻ്റെ പൈതൃകവും പുതുമയും ഒത്തുചേരുന്ന ആഭരണങ്ങൾ. തലമുറകളായി നിങ്ങൾ നൽകുന്ന വിശ്വാസത്തിന് സ്വർണ്ണത്തേക്കാൾ തിളക്കമുണ്ട്.",
       video:
-        "https://res.cloudinary.com/fylz5e3j/video/upload/v1782936959/VN20260702_013328_tbexfn.mp4",
+        "https://res.cloudinary.com/apvcphao/video/upload/v1785387729/VN20260702_013328_tbexfn.mp4",
       segments: { startAt: 16, loopEnd: 24 },
     },
   ],
@@ -49,7 +49,7 @@ export const BRAND: BrandConfig = {
     "/images/store1.webp",
     "/images/store2.webp",
     "/images/store3.webp",
-    "https://res.cloudinary.com/fylz5e3j/image/upload/v1782940196/hayazbb_wb1juf.webp",
+    "https://res.cloudinary.com/apvcphao/image/upload/v1785407783/hayazbb_wb1juf.webp",
   ],
 
   address: "Near Reliance Communications, Kodungallur, Kerala 680664",

@@ -45,6 +45,13 @@ export interface BrandConfig {
 
   storeImages: string[];
 
+  /** Our Heritage: gold heading shown above the brand story */
+  heritageHeading: string;
+  /** Our Heritage: brand story paragraphs (Malayalam) rendered in gold */
+  heritageStory: string[];
+  /** Our Heritage: full-width auto-swapping gallery images */
+  heritageImages: string[];
+
   address: string;
   city: string;
   state: string;

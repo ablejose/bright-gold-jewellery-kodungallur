@@ -22,8 +22,9 @@ const config: Config = {
       },
       fontFamily: {
         // Wired to next/font CSS variables in app/layout.tsx
-        display: ["var(--font-cormorant)", "Cormorant Garamond", "serif"],
-        sans: ["var(--font-inter)", "Inter", "system-ui", "sans-serif"],
+        display: ["var(--font-cormorant)", "var(--font-malayalam)", "Cormorant Garamond", "serif"],
+        sans: ["var(--font-inter)", "var(--font-malayalam)", "Inter", "system-ui", "sans-serif"],
+        malayalam: ["var(--font-malayalam)", "Noto Sans Malayalam", "sans-serif"],
       },
       fontSize: {
         "display-xl": ["clamp(3.5rem, 8vw, 5.5rem)", { lineHeight: "1.05", letterSpacing: "-0.01em" }],

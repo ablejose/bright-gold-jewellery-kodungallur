@@ -20,14 +20,6 @@ export const BRAND: BrandConfig = {
 
   storyVideos: [
     {
-      quote: "ലാളിത്യത്തിലെ പൂർണ്ണത.",
-      description:
-        "അണിയാൻ തീരെ ഭാരമില്ലാത്ത, എന്നാൽ കണ്ണഞ്ചിപ്പിക്കുന്ന ഡിസൈനുകൾ. നിങ്ങളുടെ ഓരോ സാധാരണ ദിവസത്തെയും മനോഹരമാക്കാൻ ഇവ മതിയാകും.",
-      video:
-        "https://res.cloudinary.com/apvcphao/video/upload/v1785387729/VN20260702_013328_tbexfn.mp4",
-      segments: { startAt: 0, loopEnd: 8 },
-    },
-    {
       quote: "കൈകളിൽ വിരിയുന്ന വിസ്മയം.",
       description:
         "ഓരോ ആഭരണവും ഓരോ കലാരൂപമാണ്. അതിസൂക്ഷ്മമായി, തികഞ്ഞ പൂർണ്ണതയോടെ രൂപപ്പെടുത്തിയെടുത്തവ. നിങ്ങളുടെ സ്വപ്നങ്ങൾക്ക് സ്വർണ്ണത്തിൽ ജീവൻ വയ്ക്കുമ്പോൾ.",
@@ -50,6 +42,17 @@ export const BRAND: BrandConfig = {
     "/images/store2.webp",
     "/images/store3.webp",
     "https://res.cloudinary.com/apvcphao/image/upload/v1785407783/hayazbb_wb1juf.webp",
+  ],
+
+  heritageHeading: "ഞങ്ങളുടെ കഥ",
+  heritageStory: [
+    "നിങ്ങളുടെ സന്തോഷനിമിഷങ്ങൾക്ക് എപ്പോഴും മാറ്റുകൂട്ടാൻ കൊടുങ്ങല്ലൂരിൽ ബ്രൈറ്റ് ഗോൾഡ് ജ്വല്ലറി ഒപ്പമുണ്ട്. പരമ്പരാഗത തനിമയും പുത്തൻ ട്രെൻഡുകളും ഒത്തുചേരുന്ന സ്വർണ്ണ, വെള്ളി, ഡയമണ്ട് ആഭരണങ്ങളുടെ ആകർഷകമായ ശേഖരം.",
+    "ലളിതവും എന്നാൽ അങ്ങേയറ്റം മനോഹരവുമായ ഞങ്ങളുടെ ആഭരണങ്ങൾ, നിങ്ങളുടെ ഓരോ കുഞ്ഞു സന്തോഷങ്ങളെയും തിളക്കമേകാൻ നിങ്ങളോടൊപ്പമുണ്ടാകും.",
+  ],
+  heritageImages: [
+    "/images/heritage1.webp",
+    "/images/heritage2.webp",
+    "/images/heritage3.webp",
   ],
 
   address: "Near Reliance Communications, Kodungallur, Kerala 680664",

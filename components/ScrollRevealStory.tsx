@@ -1,79 +1,70 @@
 "use client";
 
-import { useRef } from "react";
-import {
-  motion,
-  useScroll,
-  useTransform,
-  type MotionValue,
-} from "motion/react";
+import { motion, useTransform, type MotionValue } from "motion/react";
 
-/** Words kept emphasised (bolder + brighter gold): "Bright Gold". */
+/** Words kept permanently highlighted (gold-foil brand font): "Bright Gold". */
 const HIGHLIGHT_WORDS = new Set(["ബ്രൈറ്റ്", "ഗോൾഡ്"]);
 
-const DIM = "#6E6E7A"; // subdued starting colour
+const DIM = "#66666F"; // subdued starting colour
 const GOLD = "#F2D28B"; // brand gold
-const GOLD_BRIGHT = "#FFDE93"; // brighter gold for the highlighted words
 
-function Word({
+function RevealWord({
   text,
   progress,
   range,
-  highlight,
 }: {
   text: string;
   progress: MotionValue<number>;
   range: [number, number];
-  highlight: boolean;
 }) {
-  const color = useTransform(progress, range, [
-    DIM,
-    highlight ? GOLD_BRIGHT : GOLD,
-  ]);
-  return (
-    <motion.span
-      style={{ color }}
-      className={highlight ? "font-bold" : undefined}
-    >
-      {text}
-    </motion.span>
-  );
+  const color = useTransform(progress, range, [DIM, GOLD]);
+  return <motion.span style={{ color }}>{text}</motion.span>;
 }
 
 /**
- * Scroll-linked story text. Each word fades from a dim tone to gold, one after
- * another, as the paragraph scrolls up the viewport — fully gold by the time it
- * reaches the top of the range. "ബ്രൈറ്റ് ഗോൾഡ്" stays bolder and a brighter
- * gold so the brand name is highlighted.
+ * Scroll-linked story text driven by an external scroll `progress` value.
+ * Each word fades from a dim tone to gold, one after another, across the
+ * [start, end] slice of progress — fully gold by the time it reaches `end`.
+ * "ബ്രൈറ്റ് ഗോൾഡ്" is rendered in a distinct gold-foil brand font so it stays
+ * highlighted throughout.
  */
 export function ScrollRevealStory({
   text,
+  progress,
+  start = 0,
+  end = 1,
   className = "",
 }: {
   text: string;
+  progress: MotionValue<number>;
+  start?: number;
+  end?: number;
   className?: string;
 }) {
-  const ref = useRef<HTMLParagraphElement>(null);
-  const { scrollYProgress } = useScroll({
-    target: ref,
-    offset: ["start 0.85", "end 0.5"],
-  });
-
   const words = text.split(" ");
+  const span = end - start;
 
   return (
-    <p ref={ref} className={className}>
+    <p className={className}>
       {words.map((word, i) => {
-        const start = i / words.length;
-        const end = (i + 1) / words.length;
+        const trailing = i < words.length - 1 ? " " : "";
+
+        if (HIGHLIGHT_WORDS.has(word)) {
+          return (
+            <span key={i}>
+              <span className="font-brand font-bold text-gold-foil">{word}</span>
+              {trailing}
+            </span>
+          );
+        }
+
+        const wStart = start + (span * i) / words.length;
+        const wEnd = start + (span * (i + 1)) / words.length;
         return (
-          <Word
-            key={i}
-            text={i < words.length - 1 ? `${word} ` : word}
-            progress={scrollYProgress}
-            range={[start, end]}
-            highlight={HIGHLIGHT_WORDS.has(word)}
-          />
+          <span key={i}>
+            <RevealWord text={word} progress={progress} range={[wStart, wEnd]} />
+            {trailing}
+          </span>
         );
       })}
     </p>

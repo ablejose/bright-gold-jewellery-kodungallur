@@ -25,6 +25,7 @@ const config: Config = {
         display: ["var(--font-cormorant)", "var(--font-malayalam)", "Cormorant Garamond", "serif"],
         sans: ["var(--font-inter)", "var(--font-malayalam)", "Inter", "system-ui", "sans-serif"],
         malayalam: ["var(--font-malayalam)", "Noto Sans Malayalam", "sans-serif"],
+        brand: ["var(--font-brand)", "Baloo Chettan 2", "cursive"],
       },
       fontSize: {
         "display-xl": ["clamp(3.5rem, 8vw, 5.5rem)", { lineHeight: "1.05", letterSpacing: "-0.01em" }],

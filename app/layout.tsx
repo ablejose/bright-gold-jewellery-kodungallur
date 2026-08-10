@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Cormorant_Garamond, Inter, Noto_Sans_Malayalam } from "next/font/google";
+import { Cormorant_Garamond, Inter, Noto_Sans_Malayalam, Baloo_Chettan_2 } from "next/font/google";
 import { BRAND } from "@/config/brand";
 import { buildJsonLd, getSiteUrl } from "@/lib/seo";
 import { LoadingScreen } from "@/components/LoadingScreen";
@@ -22,6 +22,13 @@ const notoMalayalam = Noto_Sans_Malayalam({
   subsets: ["malayalam"],
   weight: ["400", "500", "600", "700"],
   variable: "--font-malayalam",
+  display: "swap",
+});
+
+const baloo = Baloo_Chettan_2({
+  subsets: ["malayalam", "latin"],
+  weight: ["600", "700", "800"],
+  variable: "--font-brand",
   display: "swap",
 });
 
@@ -74,7 +81,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   const jsonLd = buildJsonLd(BRAND);
 
   return (
-    <html lang="en" className={`${cormorant.variable} ${inter.variable} ${notoMalayalam.variable}`}>
+    <html lang="en" className={`${cormorant.variable} ${inter.variable} ${notoMalayalam.variable} ${baloo.variable}`}>
       <head>
         <link rel="preconnect" href="https://res.cloudinary.com" crossOrigin="" />
         {jsonLd.map((schema, index) => (

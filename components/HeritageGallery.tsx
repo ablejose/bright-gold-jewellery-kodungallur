@@ -5,10 +5,11 @@ import { useEffect, useState } from "react";
 import { BRAND } from "@/config/brand";
 
 /**
- * Full-width heritage gallery. Real store / team / family photos act as trust
- * signals and auto-advance ("swap") every 1.5s with a smooth horizontal slide.
- * A cloned first slide gives a seamless loop; reduced-motion users see a static
- * first image. Replaces the former English heritage copy and Chapter 01.
+ * Heritage gallery card. Real store / team / family photos (trust signals)
+ * auto-advance ("swap") every 1.5s with a smooth horizontal slide. Images use
+ * `object-contain` inside a fixed card so the FULL photo is always visible and
+ * never cropped, regardless of orientation. The card stays within the layout
+ * margins. Seamless loop; reduced-motion users see a static first image.
  */
 export function HeritageGallery() {
   const images = BRAND.heritageImages;
@@ -48,7 +49,7 @@ export function HeritageGallery() {
   const active = index % count;
 
   return (
-    <div className="relative w-full overflow-hidden">
+    <div className="relative w-full overflow-hidden rounded-3xl border border-gold/20 bg-background shadow-xl shadow-black/40 ring-1 ring-white/5">
       <div
         className="flex"
         style={{
@@ -59,25 +60,20 @@ export function HeritageGallery() {
         }}
       >
         {slides.map((src, i) => (
-          <div
-            key={i}
-            className="relative h-[60vh] min-h-[380px] w-full shrink-0 md:h-[78vh]"
-          >
+          <div key={i} className="relative aspect-square w-full shrink-0">
             <Image
               src={src}
               alt={`${BRAND.businessName}, ${BRAND.city}`}
               fill
               priority={i === 0}
-              sizes="100vw"
-              className="object-cover"
+              sizes="(max-width: 768px) 100vw, 45vw"
+              className="object-contain"
             />
-            <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-background via-background/20 to-transparent" />
-            <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-background/40 via-transparent to-background/40" />
           </div>
         ))}
       </div>
 
-      <div className="absolute inset-x-0 bottom-6 flex justify-center gap-2">
+      <div className="absolute inset-x-0 bottom-4 flex justify-center gap-2">
         {images.map((_, i) => (
           <span
             key={i}

@@ -5,11 +5,11 @@ import { useEffect, useState } from "react";
 import { BRAND } from "@/config/brand";
 
 /**
- * Heritage gallery card. Real store / team / family photos (trust signals)
+ * Heritage gallery. Real store / team / family photos (trust signals)
  * auto-advance ("swap") every 1.5s with a smooth horizontal slide. Images use
- * `object-contain` inside a fixed card so the FULL photo is always visible and
- * never cropped, regardless of orientation. The card stays within the layout
- * margins. Seamless loop; reduced-motion users see a static first image.
+ * `object-contain` inside a large, borderless area (no card chrome) so each
+ * full photo is shown uncropped and as wide as it can go. Seamless loop;
+ * reduced-motion users see a static first image.
  */
 export function HeritageGallery() {
   const images = BRAND.heritageImages;
@@ -49,7 +49,7 @@ export function HeritageGallery() {
   const active = index % count;
 
   return (
-    <div className="relative w-full overflow-hidden rounded-3xl border border-gold/20 bg-background shadow-xl shadow-black/40 ring-1 ring-white/5">
+    <div className="relative w-full overflow-hidden">
       <div
         className="flex"
         style={{
@@ -60,13 +60,13 @@ export function HeritageGallery() {
         }}
       >
         {slides.map((src, i) => (
-          <div key={i} className="relative aspect-square w-full shrink-0">
+          <div key={i} className="relative h-[52vh] w-full shrink-0 md:h-[72vh]">
             <Image
               src={src}
               alt={`${BRAND.businessName}, ${BRAND.city}`}
               fill
               priority={i === 0}
-              sizes="(max-width: 768px) 100vw, 45vw"
+              sizes="(max-width: 768px) 100vw, 66vw"
               className="object-contain"
             />
           </div>

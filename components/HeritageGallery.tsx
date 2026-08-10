@@ -5,11 +5,11 @@ import { useEffect, useState } from "react";
 import { BRAND } from "@/config/brand";
 
 /**
- * Heritage gallery. Full-viewport-width cinematic band of real store / team
- * photos (trust signals) that auto-advance ("swap") every 1.5s. No rounded
- * corners; the left and right edges fade into the black background via a
- * horizontal mask. Seamless loop; reduced-motion users see a static first
- * image.
+ * Heritage gallery. Full-viewport-width band of real store / team photos
+ * (trust signals) that auto-advance ("swap") every 1.5s. The band matches the
+ * photo's own 3:2 proportions, so the FULL image is shown edge-to-edge with no
+ * crop. No rounded corners; the left and right edges softly fade into the black
+ * background. Seamless loop; reduced-motion users see a static first image.
  */
 export function HeritageGallery() {
   const images = BRAND.heritageImages;
@@ -48,8 +48,10 @@ export function HeritageGallery() {
   const slides = [...images, images[0]];
   const active = index % count;
 
+  // Soft dissolve on the far left / right edges only, so the whole photo stays
+  // visible while the edges melt into the black background.
   const edgeFade =
-    "linear-gradient(to right, transparent 0%, #000 8%, #000 92%, transparent 100%)";
+    "linear-gradient(to right, transparent 0%, #000 4%, #000 96%, transparent 100%)";
 
   return (
     <div
@@ -66,14 +68,14 @@ export function HeritageGallery() {
         }}
       >
         {slides.map((src, i) => (
-          <div key={i} className="relative h-[46vh] w-full shrink-0 md:h-[58vh]">
+          <div key={i} className="relative aspect-[3/2] w-full shrink-0">
             <Image
               src={src}
               alt={`${BRAND.businessName}, ${BRAND.city}`}
               fill
               priority={i === 0}
               sizes="100vw"
-              className="object-cover object-[center_38%]"
+              className="object-contain"
             />
           </div>
         ))}

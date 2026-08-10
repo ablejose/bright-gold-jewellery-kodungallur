@@ -5,10 +5,10 @@ import { useEffect, useState } from "react";
 import { BRAND } from "@/config/brand";
 
 /**
- * Heritage gallery. Real store / team / family photos (trust signals)
- * auto-advance ("swap") every 1.5s with a smooth horizontal slide. Images use
- * `object-contain` inside a large, borderless area (no card chrome) so each
- * full photo is shown uncropped and as wide as it can go. Seamless loop;
+ * Heritage gallery. Real store / team photos (trust signals) auto-advance
+ * ("swap") every 1.5s with a smooth horizontal slide. All images share the
+ * same landscape (3:2) frame so they fill the area edge-to-edge and render
+ * cleanly, with no letterbox and no meaningful crop. Seamless loop;
  * reduced-motion users see a static first image.
  */
 export function HeritageGallery() {
@@ -49,7 +49,7 @@ export function HeritageGallery() {
   const active = index % count;
 
   return (
-    <div className="relative w-full overflow-hidden">
+    <div className="relative w-full overflow-hidden rounded-2xl">
       <div
         className="flex"
         style={{
@@ -60,14 +60,14 @@ export function HeritageGallery() {
         }}
       >
         {slides.map((src, i) => (
-          <div key={i} className="relative h-[52vh] w-full shrink-0 md:h-[72vh]">
+          <div key={i} className="relative aspect-[3/2] w-full shrink-0">
             <Image
               src={src}
               alt={`${BRAND.businessName}, ${BRAND.city}`}
               fill
               priority={i === 0}
-              sizes="(max-width: 768px) 100vw, 66vw"
-              className="object-contain"
+              sizes="(max-width: 768px) 100vw, 60vw"
+              className="object-cover"
             />
           </div>
         ))}

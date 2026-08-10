@@ -59,7 +59,7 @@ export function HeritageGallery() {
         }}
       >
         {slides.map((src, i) => (
-          <div key={i} className="relative aspect-[3/2] w-full shrink-0">
+          <div key={i} className="relative aspect-[8/5] w-full shrink-0">
             <Image
               src={src}
               alt={`${BRAND.businessName}, ${BRAND.city}`}

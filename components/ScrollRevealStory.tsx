@@ -1,6 +1,7 @@
 "use client";
 
-import { motion, useTransform, type MotionValue } from "motion/react";
+import { useRef } from "react";
+import { motion, useScroll, useTransform, type MotionValue } from "motion/react";
 
 /** Words kept permanently highlighted (gold-foil brand font): "Bright Gold". */
 const HIGHLIGHT_WORDS = new Set(["ബ്രൈറ്റ്", "ഗോൾഡ്"]);
@@ -22,29 +23,28 @@ function RevealWord({
 }
 
 /**
- * Scroll-linked story text driven by an external scroll `progress` value (the
- * section is pinned, so the page stays still while these words turn gold one
- * after another across the [start, end] slice of progress). "ബ്രൈറ്റ് ഗോൾഡ്"
- * is rendered in a distinct gold-foil brand font so it stays highlighted.
+ * Scroll-linked story text. Each word fades from a dim tone to gold, one after
+ * another, as the paragraph scrolls up into view — fully gold near the middle
+ * of the viewport. "ബ്രൈറ്റ് ഗോൾഡ്" is rendered in a distinct gold-foil brand
+ * font so it stays highlighted throughout.
  */
 export function ScrollRevealStory({
   text,
-  progress,
-  start = 0,
-  end = 1,
   className = "",
 }: {
   text: string;
-  progress: MotionValue<number>;
-  start?: number;
-  end?: number;
   className?: string;
 }) {
+  const ref = useRef<HTMLParagraphElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: ref,
+    offset: ["start 0.9", "end 0.5"],
+  });
+
   const words = text.split(" ");
-  const span = end - start;
 
   return (
-    <p className={className}>
+    <p ref={ref} className={className}>
       {words.map((word, i) => {
         const trailing = i < words.length - 1 ? " " : "";
 
@@ -57,11 +57,15 @@ export function ScrollRevealStory({
           );
         }
 
-        const wStart = start + (span * i) / words.length;
-        const wEnd = start + (span * (i + 1)) / words.length;
+        const start = i / words.length;
+        const end = (i + 1) / words.length;
         return (
           <span key={i}>
-            <RevealWord text={word} progress={progress} range={[wStart, wEnd]} />
+            <RevealWord
+              text={word}
+              progress={scrollYProgress}
+              range={[start, end]}
+            />
             {trailing}
           </span>
         );

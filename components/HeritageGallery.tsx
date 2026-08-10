@@ -5,11 +5,11 @@ import { useEffect, useState } from "react";
 import { BRAND } from "@/config/brand";
 
 /**
- * Heritage gallery. Real store / team photos (trust signals) auto-advance
- * ("swap") every 1.5s with a smooth horizontal slide. All images share the
- * same landscape (3:2) frame so they fill the area edge-to-edge and render
- * cleanly, with no letterbox and no meaningful crop. Seamless loop;
- * reduced-motion users see a static first image.
+ * Heritage gallery. Full-viewport-width cinematic band of real store / team
+ * photos (trust signals) that auto-advance ("swap") every 1.5s. No rounded
+ * corners; the left and right edges fade into the black background via a
+ * horizontal mask. Seamless loop; reduced-motion users see a static first
+ * image.
  */
 export function HeritageGallery() {
   const images = BRAND.heritageImages;
@@ -48,8 +48,14 @@ export function HeritageGallery() {
   const slides = [...images, images[0]];
   const active = index % count;
 
+  const edgeFade =
+    "linear-gradient(to right, transparent 0%, #000 8%, #000 92%, transparent 100%)";
+
   return (
-    <div className="relative w-full overflow-hidden rounded-2xl">
+    <div
+      className="relative w-full overflow-hidden"
+      style={{ WebkitMaskImage: edgeFade, maskImage: edgeFade }}
+    >
       <div
         className="flex"
         style={{
@@ -60,14 +66,14 @@ export function HeritageGallery() {
         }}
       >
         {slides.map((src, i) => (
-          <div key={i} className="relative aspect-[3/2] w-full shrink-0">
+          <div key={i} className="relative h-[46vh] w-full shrink-0 md:h-[58vh]">
             <Image
               src={src}
               alt={`${BRAND.businessName}, ${BRAND.city}`}
               fill
               priority={i === 0}
-              sizes="(max-width: 768px) 100vw, 60vw"
-              className="object-cover"
+              sizes="100vw"
+              className="object-cover object-[center_38%]"
             />
           </div>
         ))}

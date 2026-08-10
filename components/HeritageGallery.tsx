@@ -5,11 +5,10 @@ import { useEffect, useState } from "react";
 import { BRAND } from "@/config/brand";
 
 /**
- * Heritage gallery. Full-viewport-width band of real store / team photos
- * (trust signals) that auto-advance ("swap") every 1.5s. The band matches the
- * photo's own 3:2 proportions, so the FULL image is shown edge-to-edge with no
- * crop. No rounded corners; the left and right edges softly fade into the black
- * background. Seamless loop; reduced-motion users see a static first image.
+ * Heritage gallery. A margin-aligned, rounded card of real store / team photos
+ * (trust signals) that auto-advance ("swap") every 1.5s. The frame matches the
+ * photo's own 3:2 proportions so the FULL image renders with no crop. Seamless
+ * loop; reduced-motion users see a static first image.
  */
 export function HeritageGallery() {
   const images = BRAND.heritageImages;
@@ -48,16 +47,8 @@ export function HeritageGallery() {
   const slides = [...images, images[0]];
   const active = index % count;
 
-  // Soft dissolve on the far left / right edges only, so the whole photo stays
-  // visible while the edges melt into the black background.
-  const edgeFade =
-    "linear-gradient(to right, transparent 0%, #000 4%, #000 96%, transparent 100%)";
-
   return (
-    <div
-      className="relative w-full overflow-hidden"
-      style={{ WebkitMaskImage: edgeFade, maskImage: edgeFade }}
-    >
+    <div className="relative w-full overflow-hidden rounded-card border border-border shadow-xl shadow-black/40 ring-1 ring-white/5">
       <div
         className="flex"
         style={{
@@ -74,8 +65,8 @@ export function HeritageGallery() {
               alt={`${BRAND.businessName}, ${BRAND.city}`}
               fill
               priority={i === 0}
-              sizes="100vw"
-              className="object-contain"
+              sizes="(max-width: 1280px) 92vw, 1200px"
+              className="object-cover"
             />
           </div>
         ))}

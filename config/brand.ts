@@ -50,7 +50,6 @@ export const BRAND: BrandConfig = {
   ],
   heritageImages: [
     "/images/heritage1.webp",
-    "/images/heritage3.webp",
   ],
 
   address: "Near Reliance Communications, Kodungallur, Kerala 680664",

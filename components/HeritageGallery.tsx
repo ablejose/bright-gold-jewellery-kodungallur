@@ -72,17 +72,19 @@ export function HeritageGallery() {
         ))}
       </div>
 
-      <div className="absolute inset-x-0 bottom-4 flex justify-center gap-2">
-        {images.map((_, i) => (
-          <span
-            key={i}
-            aria-hidden="true"
-            className={`h-1.5 rounded-full transition-all duration-500 ${
-              active === i ? "w-7 bg-gold" : "w-2 bg-ivory/40"
-            }`}
-          />
-        ))}
-      </div>
+      {count > 1 ? (
+        <div className="absolute inset-x-0 bottom-4 flex justify-center gap-2">
+          {images.map((_, i) => (
+            <span
+              key={i}
+              aria-hidden="true"
+              className={`h-1.5 rounded-full transition-all duration-500 ${
+                active === i ? "w-7 bg-gold" : "w-2 bg-ivory/40"
+              }`}
+            />
+          ))}
+        </div>
+      ) : null}
     </div>
   );
 }

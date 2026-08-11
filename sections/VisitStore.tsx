@@ -6,10 +6,14 @@ import { Button } from "@/components/Button";
 import { telHref } from "@/lib/format";
 
 /**
- * Visit Store (Document 2 §7). Three responsive storefront images, business
- * details, and action buttons. Google Maps is linked, never embedded.
+ * Visit Store (Document 2 §7). A horizontal, swipeable gallery of storefront /
+ * team photos sized so ~2.5 images are visible at once while scrolling, plus
+ * business details and action buttons. Google Maps is linked, never embedded.
  */
 export function VisitStore() {
+  // Real store / team photos first, then the storefront set.
+  const galleryImages = [...BRAND.heritageImages, ...BRAND.storeImages];
+
   return (
     <section id="visit-store" className="py-24 md:py-32">
       <div className="container-lux">
@@ -22,17 +26,15 @@ export function VisitStore() {
         </Reveal>
 
         <Reveal>
-          <div className="mt-12 overflow-hidden [mask-image:linear-gradient(to_right,transparent,black_8%,black_92%,transparent)]">
-            <div className="marquee-rtl flex w-max gap-6">
-              {[...BRAND.storeImages, ...BRAND.storeImages].map((src, index) => (
-                <div key={index} className="w-56 shrink-0 sm:w-64 md:w-72">
-                  <StoreImage
-                    src={src}
-                    alt={`${BRAND.businessName} storefront view ${(index % BRAND.storeImages.length) + 1}`}
-                  />
-                </div>
-              ))}
-            </div>
+          <div className="mt-12 flex snap-x snap-mandatory gap-4 overflow-x-auto pb-4 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            {galleryImages.map((src, index) => (
+              <div key={index} className="w-[40%] shrink-0 snap-start">
+                <StoreImage
+                  src={src}
+                  alt={`${BRAND.businessName} store view ${index + 1}`}
+                />
+              </div>
+            ))}
           </div>
         </Reveal>
 

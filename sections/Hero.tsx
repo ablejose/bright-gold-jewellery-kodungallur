@@ -1,15 +1,14 @@
 import { BRAND } from "@/config/brand";
 import { Button } from "@/components/Button";
-import { splitBrandName, telHref } from "@/lib/format";
+import { telHref } from "@/lib/format";
 
 /**
  * Full-viewport hero with an autoplay, muted, looping Cloudinary film behind
  * the brand name, tagline and a single CTA (Document 2 §4, Document 5 §7).
- * Content anchored slightly left of center.
+ * The title is the single brand word "Bright Gold". Content anchored slightly
+ * left of center.
  */
 export function Hero() {
-  const { primary, secondary } = splitBrandName(BRAND.businessName);
-
   return (
     <section id="top" className="relative flex h-svh min-h-[640px] w-full items-center overflow-hidden">
       <video
@@ -27,10 +26,7 @@ export function Hero() {
 
       <div className="container-lux relative z-10">
         <div className="max-w-2xl">
-          <h1 className="font-display text-display-xl text-gold-sweep">{primary}</h1>
-          {secondary ? (
-            <p className="mt-3 label-eyebrow">{secondary}</p>
-          ) : null}
+          <h1 className="font-display text-display-xl text-gold-sweep">Bright Gold</h1>
           <p className="mt-6 font-sans text-body-lg text-gold">{BRAND.tagline}</p>
           <div className="mt-10 flex flex-wrap items-center gap-4">
             <Button href="#visit-store">Visit Store</Button>

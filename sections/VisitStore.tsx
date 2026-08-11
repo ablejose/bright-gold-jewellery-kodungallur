@@ -12,9 +12,9 @@ import { telHref } from "@/lib/format";
  * pauses the scroll. Google Maps is linked, never embedded.
  */
 const VISIT_IMAGES = [
-  "/images/visit1.webp",
-  "/images/visit2.webp",
-  "/images/visit3.webp",
+  "https://res.cloudinary.com/nplfkyjy/image/upload/v1786453232/bright-gold/visit1.webp",
+  "https://res.cloudinary.com/nplfkyjy/image/upload/v1786453233/bright-gold/visit2.webp",
+  "https://res.cloudinary.com/nplfkyjy/image/upload/v1786453233/bright-gold/visit3.webp",
 ];
 
 export function VisitStore() {

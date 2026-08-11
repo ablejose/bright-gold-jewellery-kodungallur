@@ -12,11 +12,11 @@ export const BRAND: BrandConfig = {
   description:
     "Bright Gold Jewellery is Kodungallur's trusted destination for exquisite gold, diamond, and silver jewellery. Serving Kodungallur and the surrounding areas with timeless craftsmanship and contemporary designs for every celebration.",
 
-  logo: "/icons/logo.svg",
+  logo: "https://res.cloudinary.com/nplfkyjy/image/upload/v1786453234/bright-gold/logo.svg",
   favicon: "/favicon.ico",
 
   heroVideo:
-    "https://res.cloudinary.com/apvcphao/video/upload/v1785387729/VN20260702_013328_tbexfn.mp4",
+    "https://res.cloudinary.com/nplfkyjy/video/upload/v1786453236/bright-gold/hero.mp4",
 
   storyVideos: [
     {
@@ -24,7 +24,7 @@ export const BRAND: BrandConfig = {
       description:
         "ഓരോ ആഭരണവും ഓരോ കലാരൂപമാണ്. അതിസൂക്ഷ്മമായി, തികഞ്ഞ പൂർണ്ണതയോടെ രൂപപ്പെടുത്തിയെടുത്തവ. നിങ്ങളുടെ സ്വപ്നങ്ങൾക്ക് സ്വർണ്ണത്തിൽ ജീവൻ വയ്ക്കുമ്പോൾ.",
       video:
-        "https://res.cloudinary.com/apvcphao/video/upload/v1785387729/VN20260702_013328_tbexfn.mp4",
+        "https://res.cloudinary.com/nplfkyjy/video/upload/v1786453236/bright-gold/hero.mp4",
       segments: { startAt: 32, loopEnd: 40 },
     },
     {
@@ -32,16 +32,16 @@ export const BRAND: BrandConfig = {
       description:
         "ഈ നാടിൻ്റെ പൈതൃകവും പുതുമയും ഒത്തുചേരുന്ന ആഭരണങ്ങൾ. തലമുറകളായി നിങ്ങൾ നൽകുന്ന വിശ്വാസത്തിന് സ്വർണ്ണത്തേക്കാൾ തിളക്കമുണ്ട്.",
       video:
-        "https://res.cloudinary.com/apvcphao/video/upload/v1785387729/VN20260702_013328_tbexfn.mp4",
+        "https://res.cloudinary.com/nplfkyjy/video/upload/v1786453236/bright-gold/hero.mp4",
       segments: { startAt: 16, loopEnd: 24 },
     },
   ],
 
   storeImages: [
-    "/images/store1.webp",
-    "/images/store2.webp",
-    "/images/store3.webp",
-    "https://res.cloudinary.com/apvcphao/image/upload/v1785407783/hayazbb_wb1juf.webp",
+    "https://res.cloudinary.com/nplfkyjy/image/upload/v1786453228/bright-gold/store1.webp",
+    "https://res.cloudinary.com/nplfkyjy/image/upload/v1786453229/bright-gold/store2.webp",
+    "https://res.cloudinary.com/nplfkyjy/image/upload/v1786453230/bright-gold/store3.webp",
+    "https://res.cloudinary.com/nplfkyjy/image/upload/v1786453230/bright-gold/store4.webp",
   ],
 
   heritageHeading: "ഞങ്ങളുടെ കഥ",
@@ -49,7 +49,7 @@ export const BRAND: BrandConfig = {
     "നിങ്ങളുടെ സന്തോഷനിമിഷങ്ങൾക്ക് എപ്പോഴും\nമാറ്റുകൂട്ടാൻ ബ്രൈറ്റ് ഗോൾഡ് ജ്വല്ലറി\nഒപ്പമുണ്ട്. പരമ്പരാഗത തനിമയും\nപുത്തൻ ട്രെൻഡുകളും ഒത്തുചേരുന്ന\nസ്വർണ്ണം, വെള്ളി, ഡയമണ്ട്\nആഭരണങ്ങളുടെ ആകർഷകമായ ശേഖരം.",
   ],
   heritageImages: [
-    "/images/heritage3.webp",
+    "https://res.cloudinary.com/nplfkyjy/image/upload/v1786453231/bright-gold/heritage3.webp",
   ],
 
   address: "Near Reliance Communications, Kodungallur, Kerala 680664",
@@ -85,7 +85,7 @@ export const BRAND: BrandConfig = {
     ],
     canonical: "https://bright-gold-jewellery-kodungallur.vercel.app",
     ogImage:
-      "/images/store1.webp",
+      "https://res.cloudinary.com/nplfkyjy/image/upload/v1786453228/bright-gold/store1.webp",
   },
 
   faq: [],

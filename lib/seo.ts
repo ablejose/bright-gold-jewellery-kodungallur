@@ -23,7 +23,7 @@ export function buildJsonLd(brand: BrandConfig): Record<string, unknown>[] {
     "@type": "Organization",
     name: brand.businessName,
     url,
-    logo: `${url}${brand.logo}`,
+    logo: brand.logo.startsWith("http") ? brand.logo : `${url}${brand.logo}`,
     sameAs,
   };
 

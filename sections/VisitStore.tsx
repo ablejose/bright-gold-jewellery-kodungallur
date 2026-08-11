@@ -6,10 +6,17 @@ import { Button } from "@/components/Button";
 import { telHref } from "@/lib/format";
 
 /**
- * Visit Store (Document 2 §7). A single, full-width storefront photo shown at
- * its natural 3:2 proportions (no portrait crop), plus business details and
- * action buttons. Google Maps is linked, never embedded.
+ * Visit Store (Document 2 §7). A right-to-left auto-scrolling marquee of small
+ * storefront / interior photo cards (~1/4 the size of a hero image), with a
+ * slight gap between them, plus business details and action buttons. Hovering
+ * pauses the scroll. Google Maps is linked, never embedded.
  */
+const VISIT_IMAGES = [
+  "/images/visit1.webp",
+  "/images/visit2.webp",
+  "/images/visit3.webp",
+];
+
 export function VisitStore() {
   return (
     <section id="visit-store" className="py-24 md:py-32">
@@ -23,15 +30,22 @@ export function VisitStore() {
         </Reveal>
 
         <Reveal>
-          <div className="relative mt-12 aspect-[3/2] w-full overflow-hidden rounded-3xl border border-gold/20 shadow-xl shadow-black/40 ring-1 ring-white/5">
-            <Image
-              src="/images/visit1.webp"
-              alt={`${BRAND.businessName} storefront in ${BRAND.city}`}
-              fill
-              sizes="(max-width: 1280px) 92vw, 1200px"
-              className="object-cover"
-              priority
-            />
+          <div className="mt-12 overflow-hidden [mask-image:linear-gradient(to_right,transparent,black_6%,black_94%,transparent)]">
+            <div className="marquee-rtl flex w-max gap-5">
+              {[...VISIT_IMAGES, ...VISIT_IMAGES].map((src, index) => (
+                <div key={index} className="w-72 shrink-0">
+                  <div className="relative aspect-[3/2] w-full overflow-hidden rounded-2xl border border-gold/20 shadow-lg shadow-black/40 ring-1 ring-white/5">
+                    <Image
+                      src={src}
+                      alt={`${BRAND.businessName} store view ${(index % VISIT_IMAGES.length) + 1}`}
+                      fill
+                      sizes="288px"
+                      className="object-cover"
+                    />
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         </Reveal>
 

@@ -28,8 +28,8 @@ export function Hero() {
         <div className="max-w-2xl">
           <h1 className="font-display text-display-xl text-gold-sweep">Bright Gold</h1>
           <p className="mt-6 font-sans text-body-lg text-gold">{BRAND.tagline}</p>
-          <p className="mt-4 max-w-xl font-sans text-body font-bold text-white">
-            Three decades of purity, elegance, and unmatched trust in Kodungallur. Celebrate your golden moments with Bright Gold Jewellery.
+          <p className="mt-4 max-w-xl font-sans text-body-lg font-bold text-white">
+            3 Decades of purity, elegance, and unmatched trust in Kodungallur. Celebrate your golden moments with Bright Gold Jewellery.
           </p>
           <div className="mt-10 flex flex-wrap items-center gap-4">
             <Button href="#visit-store">Visit Store</Button>

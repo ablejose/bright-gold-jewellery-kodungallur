@@ -1,26 +1,51 @@
+"use client";
+
+import { useRef } from "react";
+import { motion, useScroll } from "motion/react";
 import { BRAND } from "@/config/brand";
 import { HeritageGallery } from "@/components/HeritageGallery";
 import { ScrollRevealStory } from "@/components/ScrollRevealStory";
 
 /**
  * Our Heritage. A margin-aligned, rounded gallery of real store / team photos
- * (trust signals) — aligned to the same margins as the story chapters — with
- * the Malayalam brand story below it. The story reveals word-by-word in gold as
- * it scrolls into view, and "ബ്രൈറ്റ് ഗോൾഡ്" stays highlighted in a gold-foil
- * brand font. Replaces the previous English heritage copy and the former
- * Chapter 01.
+ * sits on top. Below it the Malayalam brand story is left-aligned under the
+ * image and pushed to the right of a premium golden timeline line that runs
+ * down its left edge (aligned to the image's left margin). The line fills with
+ * gold in step with the words turning gold as the story scrolls into view;
+ * "ബ്രൈറ്റ് ഗോൾഡ്" stays highlighted in a gold-foil brand font.
  */
 export function BrandIntro() {
+  const textRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: textRef,
+    offset: ["start 0.9", "end 0.5"],
+  });
+
   return (
     <section id="about" className="py-16 md:py-24">
       <div className="container-lux">
         <HeritageGallery />
 
-        <div className="mt-10 md:mt-14">
-          <ScrollRevealStory
-            text={BRAND.heritageStory[0]}
-            className="mx-auto max-w-4xl text-center font-malayalam text-[1.7rem] font-medium leading-[1.4] md:text-[2.25rem] md:leading-[1.35]"
-          />
+        <div className="mt-10 flex gap-5 md:mt-14 md:gap-7">
+          {/* Premium golden line at the image's left edge — goldens in sync
+              with the story text. */}
+          <div
+            className="relative w-[3px] shrink-0 self-stretch overflow-hidden rounded-full bg-white/10"
+            aria-hidden="true"
+          >
+            <motion.div
+              style={{ scaleY: scrollYProgress }}
+              className="absolute inset-0 origin-top rounded-full bg-gradient-to-b from-[#FFF1C4] via-[#F2D28B] to-[#B8892F] shadow-[0_0_14px_rgba(242,210,139,0.55)]"
+            />
+          </div>
+
+          <div ref={textRef} className="max-w-3xl">
+            <ScrollRevealStory
+              text={BRAND.heritageStory[0]}
+              progress={scrollYProgress}
+              className="text-left font-malayalam text-[1.7rem] font-medium leading-[1.4] md:text-[2.25rem] md:leading-[1.35]"
+            />
+          </div>
         </div>
       </div>
     </section>

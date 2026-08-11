@@ -3,8 +3,6 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useScrolled } from "@/hooks/useScrolled";
-import { splitBrandName } from "@/lib/format";
-import { BRAND } from "@/config/brand";
 
 const LINKS = [
   { label: "About", href: "#about" },
@@ -15,11 +13,11 @@ const LINKS = [
 /**
  * Sticky navigation. Scrolled state becomes more opaque with backdrop blur and
  * reduced padding (Document 2 §3). Mobile uses a full-screen overlay menu.
+ * The logo shows the brand as a single gold title, "Bright Gold".
  */
 export function Navbar() {
   const scrolled = useScrolled();
   const [open, setOpen] = useState(false);
-  const { primary, secondary } = splitBrandName(BRAND.businessName);
 
   // While the mobile menu is open, lock the page scroll so a scroll gesture
   // first dismisses the menu ("goes back"); normal scrolling resumes only
@@ -49,15 +47,10 @@ export function Navbar() {
       }`}
     >
       <nav className="container-lux flex items-center justify-between" aria-label="Primary">
-        <Link href="#top" className="flex flex-col leading-none" aria-label={`${BRAND.businessName} home`}>
+        <Link href="#top" className="flex flex-col leading-none" aria-label="Bright Gold home">
           <span className="font-display text-xl tracking-wide text-gold">
-            {primary}
+            Bright Gold
           </span>
-          {secondary ? (
-            <span className="mt-1 font-sans text-[0.6rem] uppercase tracking-[0.22em] text-gold/75">
-              {secondary}
-            </span>
-          ) : null}
         </Link>
 
         <ul className="hidden items-center gap-10 md:flex">

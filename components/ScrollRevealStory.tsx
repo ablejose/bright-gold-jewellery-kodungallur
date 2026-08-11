@@ -24,22 +24,32 @@ function RevealWord({
 
 /**
  * Scroll-linked story text. Each word fades from a dim tone to gold, one after
- * another, as the paragraph scrolls up into view — fully gold near the middle
- * of the viewport. "ബ്രൈറ്റ് ഗോൾഡ്" is rendered in a distinct gold-foil brand
- * font so it stays highlighted throughout.
+ * another, as the paragraph scrolls up into view. An optional external
+ * `progress` MotionValue lets a parent drive the reveal so a sibling element —
+ * e.g. the heritage timeline line — can gold in perfect sync; when omitted the
+ * paragraph tracks its own scroll. "ബ്രൈറ്റ് ഗോൾഡ്" is rendered in a distinct
+ * gold-foil brand font so it stays highlighted throughout.
  */
 export function ScrollRevealStory({
   text,
+  progress,
+  start = 0,
+  end = 1,
   className = "",
 }: {
   text: string;
+  progress?: MotionValue<number>;
+  start?: number;
+  end?: number;
   className?: string;
 }) {
   const ref = useRef<HTMLParagraphElement>(null);
-  const { scrollYProgress } = useScroll({
+  const local = useScroll({
     target: ref,
     offset: ["start 0.9", "end 0.5"],
   });
+  const activeProgress = progress ?? local.scrollYProgress;
+  const span = end - start;
 
   const words = text.split(" ");
 
@@ -57,15 +67,11 @@ export function ScrollRevealStory({
           );
         }
 
-        const start = i / words.length;
-        const end = (i + 1) / words.length;
+        const wStart = start + (span * i) / words.length;
+        const wEnd = start + (span * (i + 1)) / words.length;
         return (
           <span key={i}>
-            <RevealWord
-              text={word}
-              progress={scrollYProgress}
-              range={[start, end]}
-            />
+            <RevealWord text={word} progress={activeProgress} range={[wStart, wEnd]} />
             {trailing}
           </span>
         );

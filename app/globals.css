@@ -115,6 +115,28 @@ body {
   animation: gold-sweep 5s linear infinite;
 }
 
+/* Loading dots that light up one at a time. */
+@keyframes dot-appear {
+  0% {
+    opacity: 0.15;
+    transform: scale(0.7);
+  }
+  25% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  55%,
+  100% {
+    opacity: 0.15;
+    transform: scale(0.7);
+  }
+}
+
+.loader-dot {
+  animation: dot-appear 1.35s ease-in-out infinite;
+  box-shadow: 0 0 10px rgba(242, 210, 139, 0.55);
+}
+
 @layer components {
   .container-lux {
     @apply mx-auto w-full max-w-content px-6 md:px-10 lg:px-16;

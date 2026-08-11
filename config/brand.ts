@@ -8,7 +8,7 @@ import type { BrandConfig } from "@/types/brand";
  */
 export const BRAND: BrandConfig = {
   businessName: "Bright Gold Jewellery",
-  tagline: "Fine Jewellery in Kodungallur",
+  tagline: "Kodungallur's Trusted Craftsmanship",
   description:
     "Bright Gold Jewellery is Kodungallur's trusted destination for exquisite gold, diamond, and silver jewellery. Serving Kodungallur and the surrounding areas with timeless craftsmanship and contemporary designs for every celebration.",
 

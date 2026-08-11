@@ -19,6 +19,7 @@ html {
 body {
   background-color: #050509;
   color: #f6f3f0;
+  overflow-x: hidden;
 }
 
 /* Visible focus for keyboard users (Document 3 §9) */

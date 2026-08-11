@@ -28,7 +28,7 @@ const config: Config = {
         brand: ["var(--font-brand)", "Baloo Chettan 2", "cursive"],
       },
       fontSize: {
-        "display-xl": ["clamp(3.5rem, 8vw, 5.5rem)", { lineHeight: "1.05", letterSpacing: "-0.01em" }],
+        "display-xl": ["clamp(3rem, 8vw, 5.5rem)", { lineHeight: "1.05", letterSpacing: "-0.01em" }],
         "display-l": ["clamp(2.5rem, 5vw, 3.5rem)", { lineHeight: "1.1", letterSpacing: "-0.005em" }],
         "display-m": ["clamp(2rem, 4vw, 2.5rem)", { lineHeight: "1.15" }],
         "body-lg": ["1.125rem", { lineHeight: "1.7" }],

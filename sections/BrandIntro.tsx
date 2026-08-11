@@ -25,7 +25,7 @@ export function BrandIntro() {
       <div className="container-lux">
         <HeritageGallery />
 
-        <div className="mt-10 flex gap-5 md:mt-14 md:gap-8">
+        <div className="mt-10 flex gap-4 md:mt-14 md:gap-8">
           {/* Premium golden line at the image's left edge; fills top-to-bottom
               in sync with the words turning gold. */}
           <div
@@ -42,7 +42,7 @@ export function BrandIntro() {
             <ScrollRevealStory
               text={BRAND.heritageStory[0]}
               progress={scrollYProgress}
-              className="text-right font-malayalam text-[1.7rem] font-medium leading-[1.5] md:text-[2.25rem] md:leading-[1.45]"
+              className="text-right font-malayalam text-[1.4rem] font-medium leading-[1.55] break-words sm:text-[1.7rem] md:text-[2.25rem] md:leading-[1.45]"
             />
           </div>
         </div>

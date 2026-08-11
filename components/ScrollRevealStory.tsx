@@ -24,11 +24,11 @@ function RevealWord({
 
 /**
  * Scroll-linked story text. Each word fades from a dim tone to gold, one after
- * another, as the paragraph scrolls up into view. An optional external
- * `progress` MotionValue lets a parent drive the reveal so a sibling element —
- * e.g. the heritage timeline line — can gold in perfect sync; when omitted the
- * paragraph tracks its own scroll. "ബ്രൈറ്റ് ഗോൾഡ്" is rendered in a distinct
- * gold-foil brand font so it stays highlighted throughout.
+ * another, as the paragraph scrolls up into view. Newlines ("\n") in the text
+ * are honoured as hard line breaks, so the copy can be arranged into a fixed
+ * number of lines. An optional external `progress` MotionValue lets a parent
+ * drive the reveal so a sibling (e.g. the heritage timeline line) golds in
+ * sync. "ബ്രൈറ്റ് ഗോൾഡ്" stays highlighted in a gold-foil brand font throughout.
  */
 export function ScrollRevealStory({
   text,
@@ -51,31 +51,38 @@ export function ScrollRevealStory({
   const activeProgress = progress ?? local.scrollYProgress;
   const span = end - start;
 
-  const words = text.split(" ");
+  const lines = text.split("\n").map((line) => line.split(" ").filter(Boolean));
+  const totalWords = lines.reduce((n, words) => n + words.length, 0);
 
+  let wordIndex = 0;
   return (
     <p ref={ref} className={className}>
-      {words.map((word, i) => {
-        const trailing = i < words.length - 1 ? " " : "";
+      {lines.map((words, li) => (
+        <span key={li} className="block">
+          {words.map((word, wi) => {
+            const idx = wordIndex++;
+            const trailing = wi < words.length - 1 ? " " : "";
 
-        if (HIGHLIGHT_WORDS.has(word)) {
-          return (
-            <span key={i}>
-              <span className="font-brand font-bold text-gold-foil">{word}</span>
-              {trailing}
-            </span>
-          );
-        }
+            if (HIGHLIGHT_WORDS.has(word)) {
+              return (
+                <span key={wi}>
+                  <span className="font-brand font-bold text-gold-foil">{word}</span>
+                  {trailing}
+                </span>
+              );
+            }
 
-        const wStart = start + (span * i) / words.length;
-        const wEnd = start + (span * (i + 1)) / words.length;
-        return (
-          <span key={i}>
-            <RevealWord text={word} progress={activeProgress} range={[wStart, wEnd]} />
-            {trailing}
-          </span>
-        );
-      })}
+            const wStart = start + (span * idx) / totalWords;
+            const wEnd = start + (span * (idx + 1)) / totalWords;
+            return (
+              <span key={wi}>
+                <RevealWord text={word} progress={activeProgress} range={[wStart, wEnd]} />
+                {trailing}
+              </span>
+            );
+          })}
+        </span>
+      ))}
     </p>
   );
 }

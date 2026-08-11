@@ -56,8 +56,8 @@ export function LoadingScreen() {
       </span>
       <span className="flex items-center gap-2.5" aria-hidden="true">
         <span className="loader-dot h-2.5 w-2.5 rounded-pill bg-gold" />
-        <span className="loader-dot h-2.5 w-2.5 rounded-pill bg-gold [animation-delay:0.25s]" />
-        <span className="loader-dot h-2.5 w-2.5 rounded-pill bg-gold [animation-delay:0.5s]" />
+        <span className="loader-dot h-2.5 w-2.5 rounded-pill bg-gold" />
+        <span className="loader-dot h-2.5 w-2.5 rounded-pill bg-gold" />
       </span>
     </div>
   );

@@ -120,26 +120,35 @@ body {
   animation: gold-sweep 5s linear infinite;
 }
 
-/* Loading dots that light up one at a time. */
+/* Loading dots that light up strictly one at a time (sequential). */
 @keyframes dot-appear {
   0% {
-    opacity: 0.15;
+    opacity: 0.18;
     transform: scale(0.7);
   }
-  25% {
+  16% {
     opacity: 1;
     transform: scale(1);
   }
-  55%,
+  33%,
   100% {
-    opacity: 0.15;
+    opacity: 0.18;
     transform: scale(0.7);
   }
 }
 
 .loader-dot {
-  animation: dot-appear 1.35s ease-in-out infinite;
+  animation: dot-appear 1.2s ease-in-out infinite both;
   box-shadow: 0 0 10px rgba(242, 210, 139, 0.55);
+}
+.loader-dot:nth-child(1) {
+  animation-delay: 0s;
+}
+.loader-dot:nth-child(2) {
+  animation-delay: 0.4s;
+}
+.loader-dot:nth-child(3) {
+  animation-delay: 0.8s;
 }
 
 @layer components {

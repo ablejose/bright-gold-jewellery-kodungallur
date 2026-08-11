@@ -1,19 +1,16 @@
+import Image from "next/image";
 import { BRAND } from "@/config/brand";
 import { Reveal } from "@/components/Reveal";
 import { SectionHeading } from "@/components/SectionHeading";
-import { StoreImage } from "@/components/StoreImage";
 import { Button } from "@/components/Button";
 import { telHref } from "@/lib/format";
 
 /**
- * Visit Store (Document 2 §7). A horizontal, swipeable gallery of storefront /
- * team photos sized so ~2.5 images are visible at once while scrolling, plus
- * business details and action buttons. Google Maps is linked, never embedded.
+ * Visit Store (Document 2 §7). A single, full-width storefront photo shown at
+ * its natural 3:2 proportions (no portrait crop), plus business details and
+ * action buttons. Google Maps is linked, never embedded.
  */
 export function VisitStore() {
-  // Real store / team photos first, then the storefront set.
-  const galleryImages = [...BRAND.heritageImages, ...BRAND.storeImages];
-
   return (
     <section id="visit-store" className="py-24 md:py-32">
       <div className="container-lux">
@@ -26,15 +23,15 @@ export function VisitStore() {
         </Reveal>
 
         <Reveal>
-          <div className="mt-12 flex snap-x snap-mandatory gap-4 overflow-x-auto pb-4 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-            {galleryImages.map((src, index) => (
-              <div key={index} className="w-[40%] shrink-0 snap-start">
-                <StoreImage
-                  src={src}
-                  alt={`${BRAND.businessName} store view ${index + 1}`}
-                />
-              </div>
-            ))}
+          <div className="relative mt-12 aspect-[3/2] w-full overflow-hidden rounded-3xl border border-gold/20 shadow-xl shadow-black/40 ring-1 ring-white/5">
+            <Image
+              src="/images/visit1.webp"
+              alt={`${BRAND.businessName} storefront in ${BRAND.city}`}
+              fill
+              sizes="(max-width: 1280px) 92vw, 1200px"
+              className="object-cover"
+              priority
+            />
           </div>
         </Reveal>
 

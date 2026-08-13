@@ -121,6 +121,23 @@ body {
   animation: gold-sweep 5s linear infinite;
 }
 
+/* Soft pulsing golden glow for the hero subtitle. */
+@keyframes gold-glow-pulse {
+  0%,
+  100% {
+    text-shadow: 0 0 6px rgba(242, 210, 139, 0.35), 0 0 16px rgba(242, 210, 139, 0.22);
+  }
+  50% {
+    text-shadow: 0 0 10px rgba(242, 210, 139, 0.6), 0 0 26px rgba(242, 210, 139, 0.4);
+  }
+}
+
+.text-gold-glow {
+  color: #f2d28b;
+  text-shadow: 0 0 8px rgba(242, 210, 139, 0.45), 0 0 22px rgba(242, 210, 139, 0.35);
+  animation: gold-glow-pulse 3.2s ease-in-out infinite;
+}
+
 /* Loading dots that light up strictly one at a time (sequential). */
 @keyframes dot-appear {
   0% {

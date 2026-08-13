@@ -27,7 +27,7 @@ export function Hero() {
       <div className="container-lux relative z-10">
         <div className="max-w-2xl">
           <h1 className="font-display text-display-xl text-gold-sweep">Bright Gold</h1>
-          <p className="mt-6 font-sans text-body-lg text-gold">{BRAND.tagline}</p>
+          <p className="mt-2 font-sans text-sm tracking-wide text-gold-glow">{BRAND.tagline}</p>
           <p className="mt-4 max-w-xl font-sans text-body-lg text-gold">
             3 Decades of purity, elegance, and unmatched trust in Kodungallur. Celebrate your golden moments with Bright Gold Jewellery.
           </p>

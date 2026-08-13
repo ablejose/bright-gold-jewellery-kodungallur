@@ -65,6 +65,7 @@ export function HeritageGallery() {
               alt={`${BRAND.businessName}, ${BRAND.city}`}
               fill
               priority={i === 0}
+              loading={i === 0 ? undefined : "eager"}
               sizes="(max-width: 1280px) 92vw, 1200px"
               className="object-cover"
             />

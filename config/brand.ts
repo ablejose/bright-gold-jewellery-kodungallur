@@ -64,7 +64,7 @@ export const BRAND: BrandConfig = {
   mapsLink:
     "https://www.google.com/maps/search/?api=1&query=Bright%20Gold%20Jewellery&query_place_id=ChIJd2ENEfQbCDsRD_HrNNb74MY",
 
-  openingHours: "Mon–Sat: 9:30 AM – 8:00 PM · Sunday: 10:00 AM – 7:00 PM",
+  openingHours: "Mon–Sat: 9:30 AM – 8:00 PM",
 
   instagram: "",
   facebook: "",

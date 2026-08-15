@@ -46,6 +46,13 @@ export function Footer() {
                 {BRAND.phone}
               </a>
             </li>
+            {BRAND.phone2 ? (
+              <li>
+                <a href={telHref(BRAND.phone2)} className="transition-colors duration-300 hover:text-gold">
+                  {BRAND.phone2}
+                </a>
+              </li>
+            ) : null}
             <li className="max-w-xs text-muted">{BRAND.address}</li>
           </ul>
           <div className="mt-5 flex gap-3">

@@ -52,12 +52,13 @@ export const BRAND: BrandConfig = {
     "https://res.cloudinary.com/nplfkyjy/image/upload/v1786602233/bright-gold/heritage-team.webp",
   ],
 
-  address: "Near Reliance Communications, Kodungallur, Kerala 680664",
+  address: "Near Kalpaka Weddings, North Nada, Kodungallur · Sreekumarasamajam Building, West Nada, Kodungallur",
   city: "Kodungallur",
   state: "Kerala",
   pincode: "680664",
 
   phone: "+919847181052",
+  phone2: "+919388902233",
   whatsapp: "919847181052",
   email: "",
 

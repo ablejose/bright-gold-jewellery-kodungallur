@@ -58,6 +58,8 @@ export interface BrandConfig {
   pincode: string;
 
   phone: string;
+  /** Optional secondary contact number. Omit or leave empty for a single-line brand. */
+  phone2?: string;
   whatsapp: string;
   email: string;
 

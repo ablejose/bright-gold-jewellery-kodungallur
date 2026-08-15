@@ -20,6 +20,7 @@ export function Contact() {
   const rows: Row[] = [
     { label: "Business", value: BRAND.businessName },
     { label: "Phone", value: BRAND.phone, href: telHref(BRAND.phone) },
+    { label: "", value: BRAND.phone2 ?? "", href: BRAND.phone2 ? telHref(BRAND.phone2) : undefined },
     {
       label: "WhatsApp",
       value: BRAND.phone,

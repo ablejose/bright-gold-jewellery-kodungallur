@@ -53,16 +53,24 @@ export function VisitStore() {
           <div className="mt-12 flex flex-col gap-6 border-t border-border pt-10 md:flex-row md:items-end md:justify-between">
             <div>
               <h3 className="font-display text-display-m text-ivory">{BRAND.businessName}</h3>
-              <p className="mt-3 max-w-md font-sans text-body text-muted">{BRAND.address}</p>
+              <div className="mt-3 flex flex-col gap-1">
+                {BRAND.storeAddresses.map((loc) => (
+                  <p key={loc.address} className="max-w-md font-sans text-body text-muted">
+                    • {loc.address}
+                  </p>
+                ))}
+              </div>
               <p className="mt-2 font-sans text-body text-muted">{BRAND.openingHours}</p>
               {BRAND.workshops && BRAND.workshops.length > 0 ? (
                 <div className="mt-6">
                   <h4 className="font-display text-xl text-ivory">Our Workshops</h4>
-                  {BRAND.workshops.map((workshop) => (
-                    <p key={workshop} className="mt-2 max-w-md font-sans text-body text-muted">
-                      {workshop}
-                    </p>
-                  ))}
+                  <div className="mt-2 flex flex-col gap-1">
+                    {BRAND.workshops.map((workshop) => (
+                      <p key={workshop} className="max-w-md font-sans text-body text-muted">
+                        • {workshop}
+                      </p>
+                    ))}
+                  </div>
                 </div>
               ) : null}
             </div>

@@ -52,7 +52,10 @@ export const BRAND: BrandConfig = {
     "https://res.cloudinary.com/nplfkyjy/image/upload/v1786602233/bright-gold/heritage-team.webp",
   ],
 
-  address: "Near Kalpaka Weddings, North Nada, Kodungallur · Sreekumarasamajam Building, West Nada, Kodungallur",
+  storeAddresses: [
+    { address: "Near Kalpaka Weddings, North Nada, Kodungallur", phone: "+919847181052" },
+    { address: "Sreekumarasamajam Building, West Nada, Kodungallur", phone: "+919388902233" },
+  ],
   city: "Kodungallur",
   state: "Kerala",
   pincode: "680664",

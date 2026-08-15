@@ -17,10 +17,13 @@ interface Row {
  * are omitted so unconfigured fields (e.g. email) never render blank.
  */
 export function Contact() {
+  const phones = [BRAND.phone, BRAND.phone2].filter(
+    (p): p is string => Boolean(p && p.trim()),
+  );
+
   const rows: Row[] = [
     { label: "Business", value: BRAND.businessName },
-    { label: "Phone", value: BRAND.phone, href: telHref(BRAND.phone) },
-    { label: "", value: BRAND.phone2 ?? "", href: BRAND.phone2 ? telHref(BRAND.phone2) : undefined },
+    { label: "Phone", value: phones.join(", "), href: telHref(BRAND.phone) },
     {
       label: "WhatsApp",
       value: BRAND.phone,
@@ -31,7 +34,6 @@ export function Contact() {
     { label: "Instagram", value: socialHandle(BRAND.instagram), href: BRAND.instagram, external: true },
     { label: "Facebook", value: socialLabel(BRAND.facebook), href: BRAND.facebook, external: true },
     { label: "Opening Hours", value: BRAND.openingHours },
-    { label: "Address", value: BRAND.address },
   ].filter((row) => row.value.trim().length > 0);
 
   return (
@@ -63,6 +65,18 @@ export function Contact() {
                 </dd>
               </div>
             ))}
+            <div className="flex flex-col gap-1 py-5 sm:flex-row sm:gap-8">
+              <dt className="w-40 shrink-0 font-sans text-caption uppercase tracking-[0.14em] text-muted">
+                Address
+              </dt>
+              <dd className="font-sans text-body text-ivory">
+                <div className="flex flex-col gap-1">
+                  {BRAND.storeAddresses.map((loc) => (
+                    <span key={loc.address}>• {loc.address}</span>
+                  ))}
+                </div>
+              </dd>
+            </div>
           </dl>
 
           <div className="mt-10 flex flex-col gap-4 sm:flex-row">

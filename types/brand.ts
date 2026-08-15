@@ -31,6 +31,13 @@ export interface SeoConfig {
   ogImage: string;
 }
 
+export interface StoreLocation {
+  /** Street address line for this shop / branch. */
+  address: string;
+  /** Optional contact number shown beneath this address (footer). */
+  phone?: string;
+}
+
 export interface BrandConfig {
   businessName: string;
   tagline: string;
@@ -52,7 +59,8 @@ export interface BrandConfig {
   /** Our Heritage: full-width auto-swapping gallery images */
   heritageImages: string[];
 
-  address: string;
+  /** Shop / store addresses, each optionally paired with a contact number. */
+  storeAddresses: StoreLocation[];
   city: string;
   state: string;
   pincode: string;

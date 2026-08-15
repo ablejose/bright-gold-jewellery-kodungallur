@@ -36,7 +36,7 @@ export function buildJsonLd(brand: BrandConfig): Record<string, unknown>[] {
     telephone: brand.phone,
     address: {
       "@type": "PostalAddress",
-      streetAddress: brand.address,
+      streetAddress: brand.storeAddresses[0]?.address ?? "",
       addressLocality: brand.city,
       addressRegion: brand.state,
       postalCode: brand.pincode,

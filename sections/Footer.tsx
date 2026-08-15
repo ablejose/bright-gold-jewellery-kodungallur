@@ -40,20 +40,20 @@ export function Footer() {
 
         <div>
           <p className="font-sans text-caption uppercase tracking-[0.14em] text-muted">Contact</p>
-          <ul className="mt-4 flex flex-col gap-3 font-sans text-body text-ivory">
-            <li>
-              <a href={telHref(BRAND.phone)} className="transition-colors duration-300 hover:text-gold">
-                {BRAND.phone}
-              </a>
-            </li>
-            {BRAND.phone2 ? (
-              <li>
-                <a href={telHref(BRAND.phone2)} className="transition-colors duration-300 hover:text-gold">
-                  {BRAND.phone2}
-                </a>
+          <ul className="mt-4 flex flex-col gap-4 font-sans text-body text-ivory">
+            {BRAND.storeAddresses.map((loc) => (
+              <li key={loc.address}>
+                <p className="max-w-xs text-muted">• {loc.address}</p>
+                {loc.phone ? (
+                  <a
+                    href={telHref(loc.phone)}
+                    className="mt-1 inline-block transition-colors duration-300 hover:text-gold"
+                  >
+                    {loc.phone}
+                  </a>
+                ) : null}
               </li>
-            ) : null}
-            <li className="max-w-xs text-muted">{BRAND.address}</li>
+            ))}
           </ul>
           <div className="mt-5 flex gap-3">
             <a

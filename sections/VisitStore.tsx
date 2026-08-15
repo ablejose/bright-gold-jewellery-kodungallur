@@ -55,6 +55,16 @@ export function VisitStore() {
               <h3 className="font-display text-display-m text-ivory">{BRAND.businessName}</h3>
               <p className="mt-3 max-w-md font-sans text-body text-muted">{BRAND.address}</p>
               <p className="mt-2 font-sans text-body text-muted">{BRAND.openingHours}</p>
+              {BRAND.workshops && BRAND.workshops.length > 0 ? (
+                <div className="mt-6">
+                  <h4 className="font-display text-xl text-ivory">Our Workshops</h4>
+                  {BRAND.workshops.map((workshop) => (
+                    <p key={workshop} className="mt-2 max-w-md font-sans text-body text-muted">
+                      {workshop}
+                    </p>
+                  ))}
+                </div>
+              ) : null}
             </div>
             <div className="flex flex-col gap-3 sm:flex-row">
               <Button href={BRAND.mapsLink} external variant="secondary">

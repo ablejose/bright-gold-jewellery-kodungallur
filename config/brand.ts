@@ -67,6 +67,11 @@ export const BRAND: BrandConfig = {
 
   openingHours: "Mon–Sat: 9:30 AM – 8:00 PM",
 
+  workshops: [
+    "City Center Building, Kodungallur",
+    "Near Pothanpally Church, Thrissur",
+  ],
+
   instagram: "",
   facebook: "",
 

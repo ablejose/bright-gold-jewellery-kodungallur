@@ -66,6 +66,8 @@ export interface BrandConfig {
   mapsLink: string;
 
   openingHours: string;
+  /** Optional workshop addresses shown under an "Our Workshops" heading in Visit Store. */
+  workshops?: string[];
 
   instagram: string;
   facebook: string;

@@ -72,7 +72,7 @@ export const BRAND: BrandConfig = {
 
   workshops: [
     "City Center Building, Kodungallur",
-    "Near Pothanpally Church, Thrissur",
+    "Near Puthanpally Church, Thrissur",
   ],
 
   instagram: "",

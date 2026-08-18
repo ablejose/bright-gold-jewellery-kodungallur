@@ -79,22 +79,22 @@ export const BRAND: BrandConfig = {
   facebook: "",
 
   seo: {
-    title: "Bright Gold Jewellery | Jewellery in Kodungallur",
+    title: "Bright Gold Jewellery | Gold, Silver & Diamond Store in Kodungallur",
     description:
-      "Bright Gold Jewellery — your premier jewellery store in Kodungallur. Gold, diamond and silver jewellery crafted for every occasion. Visit us in Kodungallur, Kerala.",
+      "Bright Gold Jewellery is a gold, silver and diamond jewellery store in Kodungallur, Kerala. Explore timeless gold, diamond and silver jewellery for every occasion at our Kodungallur showrooms.",
     keywords: [
       "Bright Gold Jewellery",
-      "jewellery Kodungallur",
+      "jewellery in Kodungallur",
+      "gold, silver and diamond store in Kodungallur",
       "gold jewellery Kodungallur",
-      "diamond jewellery Kodungallur",
       "silver jewellery Kodungallur",
+      "diamond jewellery Kodungallur",
       "jewellery store Kodungallur",
       "gold shop Kodungallur",
       "jewellery Kerala",
     ],
-    canonical: "https://bright-gold-jewellery-kodungallur.vercel.app",
-    ogImage:
-      "https://res.cloudinary.com/nplfkyjy/image/upload/v1786453228/bright-gold/store1.webp",
+    canonical: "https://brightgoldkodungallur.com",
+    ogImage: "/og-image.png",
   },
 
   faq: [],

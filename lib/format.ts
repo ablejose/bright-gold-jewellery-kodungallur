@@ -10,6 +10,12 @@ export function toDialable(value: string): string {
   return hasPlus ? `+${digits}` : digits;
 }
 
+/** Readable Indian mobile: "+919847181052" → "+91 98471 81052". Other shapes pass through. */
+export function displayPhone(value: string): string {
+  const match = toDialable(value).match(/^\+?91(\d{5})(\d{5})$/);
+  return match ? `+91 ${match[1]} ${match[2]}` : value;
+}
+
 /** Build a tel: href from a phone number. */
 export function telHref(phone: string): string {
   return `tel:${toDialable(phone)}`;

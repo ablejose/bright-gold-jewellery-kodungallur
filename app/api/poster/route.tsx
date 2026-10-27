@@ -1,6 +1,7 @@
 import { ImageResponse } from "next/og";
 import { BRAND } from "@/config/brand";
-import { formatAmount, formatLongDate, formatWeekday, isIsoDate, todayIST } from "@/lib/goldRate";
+import { displayPhone } from "@/lib/format";
+import { formatAmount, formatFullDate, isIsoDate, sinceLabel, todayIST } from "@/lib/goldRate";
 import { GRAMS_PER_PAVAN, type GoldRate } from "@/types/goldRate";
 
 /**
@@ -59,19 +60,36 @@ function posterPhoto(url: string, width: number, height: number): string {
   return url.replace("/upload/", `/upload/f_jpg,q_80,c_fill,g_center,w_${width},h_${height}/`);
 }
 
-function Rupee({ size }: { size: number }) {
-  return <span style={{ fontFamily: "Rupee", fontWeight: 600, fontSize: size * 0.62, marginRight: size * 0.06, marginTop: size * 0.12 }}>₹</span>;
+/** Price in Inter's lining figures, the ₹ smaller on the same baseline. */
+function Price({ value, size, color }: { value: number; size: number; color: string }) {
+  return (
+    <div style={{ display: "flex", alignItems: "baseline", fontFamily: "Sans", fontWeight: 600, fontSize: size, lineHeight: 1, color }}>
+      <span style={{ fontFamily: "Rupee", fontSize: size * 0.64, marginRight: size * 0.08 }}>₹</span>
+      {formatAmount(value)}
+    </div>
+  );
 }
 
-function Change({ rate, previous }: { rate: GoldRate | null; previous: GoldRate | null }) {
+function Change({ rate, previous, size }: { rate: GoldRate | null; previous: GoldRate | null; size: number }) {
   if (!rate || !previous) return null;
   const diff = rate.gold22 - previous.gold22;
-  const text =
-    diff === 0
-      ? "No change from previous rate"
-      : `${diff > 0 ? "Up" : "Down"} ₹${formatAmount(Math.abs(diff))} / gram from previous rate`;
+  const since = sinceLabel(rate.date, previous.date);
+  const tint = diff > 0 ? "#7FD69B" : diff < 0 ? "#F28B8B" : MUTED;
+  const text = diff === 0 ? `No change ${since}` : `${diff > 0 ? "Up" : "Down"} ₹${formatAmount(Math.abs(diff))} ${since}`;
   return (
-    <div style={{ display: "flex", fontFamily: "Sans", fontWeight: 600, fontSize: 28, color: diff > 0 ? "#7FD69B" : diff < 0 ? "#F28B8B" : MUTED }}>
+    <div
+      style={{
+        display: "flex",
+        fontFamily: "Sans",
+        fontWeight: 600,
+        fontSize: size,
+        color: tint,
+        padding: `${size * 0.35}px ${size * 0.9}px`,
+        borderRadius: 999,
+        border: `2px solid ${tint}`,
+        background: "rgba(255,255,255,0.05)",
+      }}
+    >
       {text}
     </div>
   );
@@ -92,11 +110,10 @@ function SmallRate({ label, value }: { label: string; value: number }) {
       }}
     >
       <div style={{ display: "flex", fontFamily: "Sans", fontWeight: 600, fontSize: 24, letterSpacing: 4, color: MUTED }}>{label}</div>
-      <div style={{ display: "flex", alignItems: "flex-start", fontFamily: "Display", fontWeight: 700, fontSize: 64, color: IVORY, marginTop: 6 }}>
-        <Rupee size={64} />
-        {formatAmount(value)}
+      <div style={{ display: "flex", marginTop: 16 }}>
+        <Price value={value} size={50} color={IVORY} />
       </div>
-      <div style={{ display: "flex", fontFamily: "Sans", fontSize: 22, color: MUTED }}>per gram</div>
+      <div style={{ display: "flex", fontFamily: "Sans", fontSize: 22, color: MUTED, marginTop: 12 }}>per gram</div>
     </div>
   );
 }
@@ -111,7 +128,7 @@ function Poster({ rate, previous, format }: { rate: GoldRate | null; previous: G
     rate?.silver ? { label: "SILVER", value: rate.silver } : null,
   ].filter((item): item is { label: string; value: number } => item !== null);
   const photoHeight = story ? 680 : 0;
-  const phones = [BRAND.phone, BRAND.phone2].filter(Boolean).map((p) => (p as string).replace(/^\+91/, "+91 "));
+  const phones = [BRAND.phone, BRAND.phone2].filter(Boolean).map((p) => displayPhone(p as string));
 
   return (
     <div
@@ -159,8 +176,8 @@ function Poster({ rate, previous, format }: { rate: GoldRate | null; previous: G
         <div style={{ display: "flex", fontFamily: "Sans", fontWeight: 600, fontSize: story ? 30 : 26, letterSpacing: 10, color: GOLD, marginTop: story ? 40 : 24 }}>
           {"TODAY'S GOLD RATE"}
         </div>
-        <div style={{ display: "flex", fontFamily: "Display", fontWeight: 600, fontSize: story ? 52 : 42, color: IVORY, marginTop: story ? 10 : 6 }}>
-          {`${formatLongDate(date)} · ${formatWeekday(date)}`}
+        <div style={{ display: "flex", fontFamily: "Display", fontWeight: 600, fontSize: story ? 52 : 42, color: IVORY, marginTop: story ? 16 : 14 }}>
+          {formatFullDate(date)}
         </div>
 
         {/* 22K headline card */}
@@ -170,28 +187,29 @@ function Poster({ rate, previous, format }: { rate: GoldRate | null; previous: G
             flexDirection: "column",
             alignItems: "center",
             width: "100%",
-            marginTop: story ? 40 : 24,
-            padding: story ? "36px 40px 40px" : "22px 40px 24px",
+            marginTop: story ? 40 : 40,
+            padding: story ? "36px 40px 40px" : "30px 40px 32px",
             borderRadius: 32,
             border: `2px solid ${GOLD}`,
             background: "linear-gradient(160deg, rgba(242,210,139,0.16) 0%, rgba(169,121,31,0.08) 100%)",
           }}
         >
-          <div style={{ display: "flex", fontFamily: "Sans", fontWeight: 600, fontSize: 28, letterSpacing: 6, color: GOLD }}>
-            22 KARAT · 916 GOLD
+          <div style={{ display: "flex", fontFamily: "Sans", fontWeight: 600, fontSize: story ? 28 : 24, letterSpacing: 6, color: GOLD }}>
+            22 KARAT  ·  916 GOLD
           </div>
-          <div style={{ display: "flex", alignItems: "flex-start", fontFamily: "Display", fontWeight: 700, fontSize: story ? 168 : 124, lineHeight: 1, color: GOLD, marginTop: story ? 14 : 8 }}>
-            <Rupee size={story ? 168 : 124} />
-            {rate ? formatAmount(rate.gold22) : "— —"}
+          <div style={{ display: "flex", marginTop: story ? 26 : 14 }}>
+            {rate ? <Price value={rate.gold22} size={story ? 150 : 112} color={GOLD} /> : <span style={{ fontFamily: "Sans", fontSize: 112, color: GOLD }}>— —</span>}
           </div>
-          <div style={{ display: "flex", fontFamily: "Sans", fontSize: story ? 28 : 24, color: MUTED, marginTop: 6 }}>per gram</div>
-          <div style={{ display: "flex", width: "70%", height: 1, background: "rgba(242,210,139,0.35)", margin: story ? "24px 0 20px" : "14px 0 12px" }} />
-          <div style={{ display: "flex", alignItems: "center", fontFamily: "Sans", fontWeight: 600, fontSize: story ? 40 : 32, color: IVORY }}>
-            {`1 Pavan (${GRAMS_PER_PAVAN}g)  ·  ₹${rate ? formatAmount(rate.gold22 * GRAMS_PER_PAVAN) : "—"}`}
+          <div style={{ display: "flex", fontFamily: "Sans", fontSize: story ? 28 : 24, color: MUTED, marginTop: story ? 18 : 10 }}>per gram</div>
+          <div style={{ display: "flex", width: "70%", height: 1, background: "rgba(242,210,139,0.35)", margin: story ? "28px 0 26px" : "16px 0 14px" }} />
+          <div style={{ display: "flex", alignItems: "baseline", fontFamily: "Sans", color: IVORY }}>
+            <span style={{ fontSize: story ? 32 : 26, color: MUTED, marginRight: story ? 22 : 16 }}>{`1 Pavan (${GRAMS_PER_PAVAN} g)`}</span>
+            <span style={{ fontWeight: 600, fontSize: story ? 42 : 32 }}>{`₹${rate ? formatAmount(rate.gold22 * GRAMS_PER_PAVAN) : "—"}`}</span>
           </div>
-          <div style={{ display: "flex", marginTop: story ? 14 : 8 }}>
-            <Change rate={rate} previous={previous} />
-          </div>
+        </div>
+
+        <div style={{ display: "flex", marginTop: story ? 30 : 30 }}>
+          <Change rate={rate} previous={previous} size={story ? 28 : 22} />
         </div>
 
         {others.length > 0 && story ? (
@@ -203,10 +221,10 @@ function Poster({ rate, previous, format }: { rate: GoldRate | null; previous: G
         ) : null}
 
         {others.length > 0 && !story ? (
-          <div style={{ display: "flex", gap: 34, marginTop: 20, fontFamily: "Sans", fontWeight: 600, fontSize: 28, color: IVORY }}>
+          <div style={{ display: "flex", gap: 60, marginTop: 34, fontFamily: "Sans", fontWeight: 600, fontSize: 26, color: IVORY }}>
             {others.map((item) => (
               <div key={item.label} style={{ display: "flex" }}>
-                <span style={{ color: MUTED, marginRight: 10 }}>{item.label}</span>
+                <span style={{ color: MUTED, marginRight: 12 }}>{item.label}</span>
                 {`₹${formatAmount(item.value)}`}
               </div>
             ))}
@@ -231,13 +249,17 @@ function Poster({ rate, previous, format }: { rate: GoldRate | null; previous: G
           paddingBottom: story ? 70 : 52,
         }}
       >
-        <div style={{ display: "flex", fontFamily: "Sans", fontWeight: 600, fontSize: story ? 34 : 26, color: IVORY, letterSpacing: 1 }}>
-          {phones.join("   |   ")}
+        <div style={{ display: "flex", gap: story ? 56 : 40, fontFamily: "Sans", fontWeight: 600, fontSize: story ? 34 : 26, color: IVORY, letterSpacing: 1 }}>
+          {phones.map((phone) => (
+            <span key={phone}>{phone}</span>
+          ))}
         </div>
-        <div style={{ display: "flex", fontFamily: "Sans", fontSize: story ? 26 : 20, color: MUTED, marginTop: story ? 10 : 6 }}>
-          {`North Nada & West Nada, ${BRAND.city}  ·  ${BRAND.ratePoster.website}`}
+        <div style={{ display: "flex", gap: story ? 28 : 20, fontFamily: "Sans", fontSize: story ? 24 : 19, color: MUTED, marginTop: story ? 16 : 10 }}>
+          <span>{`North Nada & West Nada, ${BRAND.city}`}</span>
+          <span>·</span>
+          <span>{BRAND.ratePoster.website}</span>
         </div>
-        <div style={{ display: "flex", fontFamily: "Sans", fontSize: story ? 18 : 16, color: GOLD_DEEP, marginTop: story ? 10 : 6 }}>
+        <div style={{ display: "flex", fontFamily: "Sans", fontSize: story ? 18 : 15, color: GOLD_DEEP, marginTop: story ? 14 : 8 }}>
           Rates are per gram, exclusive of making charges and GST.
         </div>
       </div>

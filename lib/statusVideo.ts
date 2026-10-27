@@ -1,7 +1,8 @@
 "use client";
 
 import { BRAND } from "@/config/brand";
-import { formatAmount, formatLongDate, formatWeekday } from "@/lib/goldRate";
+import { displayPhone } from "@/lib/format";
+import { formatAmount, formatFullDate } from "@/lib/goldRate";
 import { STATUS_HEIGHT as H, STATUS_WIDTH as W } from "@/lib/rateAds";
 import { GRAMS_PER_PAVAN } from "@/types/goldRate";
 
@@ -31,6 +32,8 @@ export interface StatusOverlay {
   note?: string;
   /** 22K change per gram from the previous saved day, if any. */
   change: number | null;
+  /** "since yesterday" / "since 24 Oct", shown with the change. */
+  changeSince?: string;
 }
 
 interface Fonts {
@@ -61,7 +64,9 @@ export function loadStatusFonts(): Promise<Fonts> {
     fontsReady = Promise.all([
       document.fonts.load(`700 100px ${fonts.display}`),
       document.fonts.load(`600 40px ${fonts.display}`),
+      document.fonts.load(`700 96px ${fonts.sans}`),
       document.fonts.load(`600 24px ${fonts.sans}`),
+      document.fonts.load(`500 24px ${fonts.sans}`),
       document.fonts.load(`400 24px ${fonts.sans}`),
       document.fonts.load(`700 30px ${fonts.malayalam}`, MALAYALAM_HEADING),
     ])
@@ -96,16 +101,29 @@ function roundRect(ctx: CanvasRenderingContext2D, x: number, y: number, w: numbe
   ctx.closePath();
 }
 
-/** Draw a row of [text, color] pieces centered on one line. */
-function pieces(ctx: CanvasRenderingContext2D, parts: [string, string][], y: number) {
-  const width = parts.reduce((sum, [text]) => sum + ctx.measureText(text).width, 0);
-  let x = (W - width) / 2;
+interface Run {
+  text: string;
+  font: string;
+  color: string | CanvasGradient;
+  /** Space after this run, in px. */
+  gap?: number;
+}
+
+/** Draw runs of differently styled text centered on one shared baseline. */
+function runs(ctx: CanvasRenderingContext2D, parts: Run[], y: number) {
+  const widths = parts.map((part) => {
+    ctx.font = part.font;
+    return ctx.measureText(part.text).width;
+  });
+  const total = widths.reduce((sum, width, i) => sum + width + (parts[i].gap ?? 0), 0) - (parts.at(-1)?.gap ?? 0);
+  let x = (W - total) / 2;
   ctx.textAlign = "left";
-  for (const [text, color] of parts) {
-    ctx.fillStyle = color;
-    ctx.fillText(text, x, y);
-    x += ctx.measureText(text).width;
-  }
+  parts.forEach((part, i) => {
+    ctx.font = part.font;
+    ctx.fillStyle = part.color;
+    ctx.fillText(part.text, x, y);
+    x += widths[i] + (part.gap ?? 0);
+  });
   ctx.textAlign = "center";
 }
 
@@ -132,51 +150,53 @@ export function drawStatusFrame(
   ctx.textBaseline = "alphabetic";
 
   // Header: brand over a soft dark fade.
-  const top = ctx.createLinearGradient(0, 0, 0, 260);
-  top.addColorStop(0, `rgba(${BG},0.78)`);
+  const top = ctx.createLinearGradient(0, 0, 0, 280);
+  top.addColorStop(0, `rgba(${BG},0.8)`);
   top.addColorStop(1, `rgba(${BG},0)`);
   ctx.fillStyle = top;
-  ctx.fillRect(0, 0, W, 260);
+  ctx.fillRect(0, 0, W, 280);
   ctx.fillStyle = GOLD;
   ctx.font = `700 56px ${fonts.display}`;
-  ctx.fillText(BRAND.businessName, W / 2, 96);
-  ctx.fillStyle = "rgba(246,243,240,0.8)";
+  ctx.fillText(BRAND.businessName, W / 2, 92);
+  ctx.fillStyle = "rgba(246,243,240,0.82)";
   ctx.font = `600 15px ${fonts.sans}`;
-  spaced(ctx, BRAND.ratePoster.strapline.toUpperCase(), 126, 5);
+  spaced(ctx, BRAND.ratePoster.strapline.toUpperCase(), 132, 5);
   if (data.note) {
     ctx.fillStyle = GOLD;
-    ctx.font = `600 32px ${fonts.display}`;
-    ctx.fillText(data.note, W / 2, 176, W - 80);
+    ctx.font = `600 30px ${fonts.display}`;
+    ctx.fillText(data.note, W / 2, 186, W - 96);
   }
 
-  // Rate panel slides up over the first second.
+  // Rate panel slides up over the first second. Lines sit ~40–50 px apart.
   const p = easeOut((t - 0.15) / 0.8);
   ctx.save();
   ctx.globalAlpha = p;
   ctx.translate(0, (1 - p) * 140);
 
-  const fade = ctx.createLinearGradient(0, 600, 0, 820);
+  const fade = ctx.createLinearGradient(0, 430, 0, 590);
   fade.addColorStop(0, `rgba(${BG},0)`);
-  fade.addColorStop(1, `rgba(${BG},0.93)`);
+  fade.addColorStop(1, `rgba(${BG},0.94)`);
   ctx.fillStyle = fade;
-  ctx.fillRect(0, 600, W, 220);
-  ctx.fillStyle = `rgba(${BG},0.93)`;
-  ctx.fillRect(0, 819, W, H - 819 + 140);
+  ctx.fillRect(0, 430, W, 160);
+  ctx.fillStyle = `rgba(${BG},0.94)`;
+  ctx.fillRect(0, 589, W, H - 589 + 140);
 
   ctx.fillStyle = GOLD;
   ctx.font = `600 20px ${fonts.sans}`;
-  spaced(ctx, "TODAY'S GOLD RATE", 790, 6);
+  spaced(ctx, "TODAY'S GOLD RATE", 640, 6);
   ctx.fillStyle = IVORY;
   ctx.font = `700 30px ${fonts.malayalam}`;
-  ctx.fillText(MALAYALAM_HEADING, W / 2, 836);
-  ctx.font = `600 34px ${fonts.display}`;
-  ctx.fillText(`${formatLongDate(data.date)} · ${formatWeekday(data.date)}`, W / 2, 882);
+  ctx.fillText(MALAYALAM_HEADING, W / 2, 690);
+  ctx.font = `600 32px ${fonts.display}`;
+  ctx.fillText(formatFullDate(data.date), W / 2, 740);
 
   // 22K card.
-  const card = ctx.createLinearGradient(0, 906, 0, 1126);
+  const cardTop = 774;
+  const cardHeight = 264;
+  const card = ctx.createLinearGradient(0, cardTop, 0, cardTop + cardHeight);
   card.addColorStop(0, "rgba(242,210,139,0.18)");
   card.addColorStop(1, "rgba(169,121,31,0.07)");
-  roundRect(ctx, 44, 906, W - 88, 220, 26);
+  roundRect(ctx, 52, cardTop, W - 104, cardHeight, 26);
   ctx.fillStyle = card;
   ctx.fill();
   ctx.strokeStyle = GOLD;
@@ -185,72 +205,85 @@ export function drawStatusFrame(
 
   ctx.fillStyle = GOLD;
   ctx.font = `600 18px ${fonts.sans}`;
-  spaced(ctx, "22 KARAT · 916 GOLD", 944, 5);
+  spaced(ctx, "22 KARAT  ·  916 GOLD", 816, 5);
 
-  // Price with a gold light sweeping across it every few seconds.
-  const amount = formatAmount(data.gold22);
-  ctx.font = `600 52px ${fonts.sans}`;
-  const rupeeWidth = ctx.measureText("₹").width;
-  ctx.font = `700 108px ${fonts.display}`;
-  const amountWidth = ctx.measureText(amount).width;
-  const startX = (W - rupeeWidth - 10 - amountWidth) / 2;
+  // Price in lining figures, with a gold light sweeping across it.
   const sweep = ((t * 0.45) % 1.8) - 0.4;
   const shine = ctx.createLinearGradient(sweep * W - 120, 0, sweep * W + 120, 0);
   shine.addColorStop(0, GOLD);
   shine.addColorStop(0.5, "#FFF6DA");
   shine.addColorStop(1, GOLD);
-  ctx.fillStyle = shine;
-  ctx.textAlign = "left";
-  ctx.font = `600 52px ${fonts.sans}`;
-  ctx.fillText("₹", startX, 1000);
-  ctx.font = `700 108px ${fonts.display}`;
-  ctx.fillText(amount, startX + rupeeWidth + 10, 1040);
-  ctx.textAlign = "center";
-
-  ctx.font = `500 22px ${fonts.sans}`;
-  pieces(
+  runs(
     ctx,
     [
-      ["per gram   ·   1 Pavan (8g) ", MUTED],
-      [`₹${formatAmount(data.gold22 * GRAMS_PER_PAVAN)}`, IVORY],
+      { text: "₹", font: `600 60px ${fonts.sans}`, color: shine, gap: 8 },
+      { text: formatAmount(data.gold22), font: `700 92px ${fonts.sans}`, color: shine },
     ],
-    1078,
+    912,
   );
-  if (data.change !== null) {
-    ctx.font = `600 20px ${fonts.sans}`;
-    ctx.fillStyle = data.change > 0 ? UP : data.change < 0 ? DOWN : MUTED;
-    ctx.fillText(
-      data.change === 0
-        ? "No change from previous rate"
-        : `${data.change > 0 ? "▲" : "▼"} ₹${formatAmount(Math.abs(data.change))} / gram from previous rate`,
-      W / 2,
-      1108,
-    );
-  }
-
-  const others: [string, number | undefined][] = [
-    ["24K", data.gold24],
-    ["18K", data.gold18],
-    ["Silver", data.silver],
-  ];
-  const row = others
-    .filter(([, value]) => value)
-    .flatMap(([label, value], index): [string, string][] => [
-      [`${index ? "      " : ""}${label} `, MUTED],
-      [`₹${formatAmount(value as number)}`, IVORY],
-    ]);
-  if (row.length) {
-    ctx.font = `600 23px ${fonts.sans}`;
-    pieces(ctx, row, 1166);
-  }
-
-  const phones = [BRAND.phone, BRAND.phone2].filter(Boolean).map((phone) => (phone as string).replace(/^\+91/, "+91 "));
-  ctx.fillStyle = IVORY;
-  ctx.font = `600 24px ${fonts.sans}`;
-  ctx.fillText(phones.join("   |   "), W / 2, 1214);
   ctx.fillStyle = MUTED;
-  ctx.font = `400 17px ${fonts.sans}`;
-  ctx.fillText(`North Nada & West Nada, ${BRAND.city}  ·  ${BRAND.ratePoster.website}`, W / 2, 1244);
+  ctx.font = `500 20px ${fonts.sans}`;
+  ctx.fillText("per gram", W / 2, 956);
+
+  ctx.fillStyle = "rgba(242,210,139,0.3)";
+  ctx.fillRect(150, 982, W - 300, 1);
+
+  runs(
+    ctx,
+    [
+      { text: `1 Pavan (${GRAMS_PER_PAVAN} g)`, font: `500 22px ${fonts.sans}`, color: MUTED, gap: 16 },
+      { text: `₹${formatAmount(data.gold22 * GRAMS_PER_PAVAN)}`, font: `700 27px ${fonts.sans}`, color: IVORY },
+    ],
+    1016,
+  );
+
+  // Change since the previous rate, as a small pill under the card.
+  if (data.change !== null) {
+    const since = data.changeSince ?? "since last rate";
+    const text =
+      data.change === 0
+        ? `No change ${since}`
+        : `${data.change > 0 ? "▲" : "▼"}  ₹${formatAmount(Math.abs(data.change))} ${since}`;
+    const tint = data.change > 0 ? UP : data.change < 0 ? DOWN : MUTED;
+    ctx.font = `600 20px ${fonts.sans}`;
+    const width = ctx.measureText(text).width + 44;
+    roundRect(ctx, (W - width) / 2, 1058, width, 40, 20);
+    ctx.fillStyle = "rgba(255,255,255,0.06)";
+    ctx.fill();
+    ctx.strokeStyle = tint;
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+    ctx.fillStyle = tint;
+    ctx.fillText(text, W / 2, 1085);
+  }
+
+  // Other rates as evenly spaced columns.
+  const others = (
+    [
+      ["24K", data.gold24],
+      ["18K", data.gold18],
+      ["SILVER", data.silver],
+    ] as [string, number | undefined][]
+  ).filter(([, value]) => value);
+  others.forEach(([label, value], index) => {
+    const x = W / 2 + (index - (others.length - 1) / 2) * 200;
+    ctx.fillStyle = MUTED;
+    ctx.font = `600 15px ${fonts.sans}`;
+    ctx.fillText(label, x, 1136);
+    ctx.fillStyle = IVORY;
+    ctx.font = `600 26px ${fonts.sans}`;
+    ctx.fillText(`₹${formatAmount(value as number)}`, x, 1168);
+  });
+
+  ctx.fillStyle = "rgba(242,210,139,0.25)";
+  ctx.fillRect(120, 1188, W - 240, 1);
+  const phones = [BRAND.phone, BRAND.phone2].filter(Boolean).map((phone) => displayPhone(phone as string));
+  ctx.fillStyle = IVORY;
+  ctx.font = `600 22px ${fonts.sans}`;
+  ctx.fillText(phones.join("     ·     "), W / 2, 1218);
+  ctx.fillStyle = MUTED;
+  ctx.font = `400 15px ${fonts.sans}`;
+  ctx.fillText(`North Nada & West Nada, ${BRAND.city}   ·   ${BRAND.ratePoster.website}`, W / 2, 1245);
   ctx.restore();
 
   // Gold frame on top of everything.

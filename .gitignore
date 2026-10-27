@@ -29,6 +29,9 @@ yarn-error.log*
 # vercel
 .vercel
 
+# local gold-rate store (dev only; production uses Redis)
+/.data/
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts

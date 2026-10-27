@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 import { BRAND } from "@/config/brand";
 
 /**
@@ -13,7 +14,9 @@ import { BRAND } from "@/config/brand";
  * app/globals.css.
  */
 export function LoadingScreen() {
-  const [mounted, setMounted] = useState(true);
+  // Staff open the rate desk many times a day; skip the brand splash there.
+  const skip = usePathname()?.startsWith("/admin") ?? false;
+  const [mounted, setMounted] = useState(!skip);
   const [fading, setFading] = useState(false);
 
   useEffect(() => {

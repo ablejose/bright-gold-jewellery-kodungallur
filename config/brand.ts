@@ -101,4 +101,11 @@ export const BRAND: BrandConfig = {
 
   whatsappMessage:
     "Hello Bright Gold Jewellery, I'd like to know more about your jewellery collections.",
+
+  ratePoster: {
+    image:
+      "https://res.cloudinary.com/nplfkyjy/image/upload/v1786453228/bright-gold/store1.webp",
+    strapline: "Kodungallur's Trusted Craftsmanship",
+    website: "brightgoldkodungallur.com",
+  },
 };

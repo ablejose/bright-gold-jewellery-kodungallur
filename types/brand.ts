@@ -86,4 +86,16 @@ export interface BrandConfig {
   faq: FaqItem[];
 
   whatsappMessage: string;
+
+  /** Daily gold-rate poster (shared as a WhatsApp status / message image). */
+  ratePoster: RatePosterConfig;
+}
+
+export interface RatePosterConfig {
+  /** Tall product photo for the top of the 9:16 poster (any Cloudinary image). */
+  image: string;
+  /** Short line under the brand name on the poster. */
+  strapline: string;
+  /** Website shown in the poster footer, without https://. */
+  website: string;
 }

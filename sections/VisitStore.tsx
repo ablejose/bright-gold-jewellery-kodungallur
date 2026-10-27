@@ -3,18 +3,33 @@ import { BRAND } from "@/config/brand";
 import { Reveal } from "@/components/Reveal";
 import { SectionHeading } from "@/components/SectionHeading";
 import { Button } from "@/components/Button";
+import { LoopClip } from "@/components/LoopClip";
 import { telHref } from "@/lib/format";
 
 /**
  * Visit Store (Document 2 §7). A right-to-left auto-scrolling marquee of small
- * storefront / interior photo cards (~1/4 the size of a hero image), with a
- * slight gap between them, plus business details and action buttons. Hovering
- * pauses the scroll. Google Maps is linked, never embedded.
+ * storefront / interior cards (~1/4 the size of a hero image), with a slight
+ * gap between them, plus business details and action buttons. Hovering pauses
+ * the scroll. Google Maps is linked, never embedded.
+ *
+ * A card is either a photo or a short silent clip that loops like a moving
+ * photo. Clips are trimmed and sized by Cloudinary from the shop's own footage
+ * (so_/eo_ = start/end seconds, ac_none = no audio), so no extra upload is needed.
  */
-const VISIT_IMAGES = [
-  "https://res.cloudinary.com/nplfkyjy/image/upload/v1786453232/bright-gold/visit1.webp",
-  "https://res.cloudinary.com/nplfkyjy/image/upload/v1786453233/bright-gold/visit2.webp",
-  "https://res.cloudinary.com/nplfkyjy/image/upload/v1786453233/bright-gold/visit3.webp",
+type VisitCard = { kind: "image"; src: string } | { kind: "clip"; src: string; poster: string };
+
+const CLIP = "https://res.cloudinary.com/nplfkyjy/video/upload";
+
+const VISIT_CARDS: VisitCard[] = [
+  { kind: "image", src: "https://res.cloudinary.com/nplfkyjy/image/upload/v1786453232/bright-gold/visit1.webp" },
+  {
+    // Necklaces → bangles → chain wall, 2.8 s from the brand film (~250 KB).
+    kind: "clip",
+    src: `${CLIP}/so_5.1,eo_7.9,c_fill,w_576,h_384,q_auto,ac_none/v1786644396/bright-gold/video1.mp4`,
+    poster: `${CLIP}/so_6.9,c_fill,w_576,h_384,q_auto/v1786644396/bright-gold/video1.jpg`,
+  },
+  { kind: "image", src: "https://res.cloudinary.com/nplfkyjy/image/upload/v1786453233/bright-gold/visit2.webp" },
+  { kind: "image", src: "https://res.cloudinary.com/nplfkyjy/image/upload/v1786453233/bright-gold/visit3.webp" },
 ];
 
 export function VisitStore() {
@@ -32,16 +47,25 @@ export function VisitStore() {
         <Reveal>
           <div className="mt-12 overflow-hidden [mask-image:linear-gradient(to_right,transparent,black_6%,black_94%,transparent)]">
             <div className="marquee-rtl flex w-max gap-5">
-              {[...VISIT_IMAGES, ...VISIT_IMAGES].map((src, index) => (
+              {[...VISIT_CARDS, ...VISIT_CARDS].map((card, index) => (
                 <div key={index} className="w-72 shrink-0">
                   <div className="relative aspect-[3/2] w-full overflow-hidden rounded-2xl border border-gold/20 shadow-lg shadow-black/40 ring-1 ring-white/5">
-                    <Image
-                      src={src}
-                      alt={`${BRAND.businessName} store view ${(index % VISIT_IMAGES.length) + 1}`}
-                      fill
-                      sizes="288px"
-                      className="object-cover"
-                    />
+                    {card.kind === "clip" ? (
+                      <LoopClip
+                        src={card.src}
+                        poster={card.poster}
+                        label={`Inside ${BRAND.businessName}`}
+                        className="absolute inset-0 h-full w-full object-cover"
+                      />
+                    ) : (
+                      <Image
+                        src={card.src}
+                        alt={`${BRAND.businessName} store view ${(index % VISIT_CARDS.length) + 1}`}
+                        fill
+                        sizes="288px"
+                        className="object-cover"
+                      />
+                    )}
                   </div>
                 </div>
               ))}

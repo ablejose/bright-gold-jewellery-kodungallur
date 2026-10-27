@@ -1,11 +1,15 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import { BRAND } from "@/config/brand";
 import { SharePoster } from "@/components/SharePoster";
 import { formatAmount, formatLongDate, formatRupees, formatWeekday } from "@/lib/goldRate";
+import { adClipUrl, adLength, adThumbUrl, findAd } from "@/lib/rateAds";
 import { posterFileName, posterUrl, shareMessage } from "@/lib/rateShare";
+import { canMakeStatusVideo, makeStatusVideo, type StatusVideoResult } from "@/lib/statusVideo";
 import { GRAMS_PER_PAVAN, type GoldRate } from "@/types/goldRate";
+import { StatusPreview } from "./StatusPreview";
 
 interface RateDeskProps {
   initialRates: GoldRate[];
@@ -16,6 +20,7 @@ interface RateDeskProps {
 
 interface FormState {
   date: string;
+  adId: string;
   gold22: string;
   gold18: string;
   gold24: string;
@@ -23,15 +28,18 @@ interface FormState {
   note: string;
 }
 
-const FIELDS: { key: keyof Omit<FormState, "date" | "note">; label: string; hint: string }[] = [
-  { key: "gold18", label: "18K", hint: "per gram" },
-  { key: "gold24", label: "24K", hint: "per gram" },
-  { key: "silver", label: "Silver", hint: "per gram" },
+const ADS = BRAND.ratePoster.ads;
+
+const EXTRA_FIELDS: { key: "gold18" | "gold24" | "silver"; label: string }[] = [
+  { key: "gold18", label: "18K" },
+  { key: "gold24", label: "24K" },
+  { key: "silver", label: "Silver" },
 ];
 
-function toForm(date: string, rate: GoldRate | undefined): FormState {
+function toForm(date: string, rate: GoldRate | undefined, adId?: string): FormState {
   return {
     date,
+    adId: rate?.adId ?? adId ?? ADS[0].id,
     gold22: rate ? String(rate.gold22) : "",
     gold18: rate?.gold18 ? String(rate.gold18) : "",
     gold24: rate?.gold24 ? String(rate.gold24) : "",
@@ -40,36 +48,91 @@ function toForm(date: string, rate: GoldRate | undefined): FormState {
   };
 }
 
+const toNumber = (value: string) => {
+  const number = Number(value.replace(/,/g, ""));
+  return Number.isFinite(number) && number > 0 ? number : undefined;
+};
+
 const inputClass =
   "w-full rounded-md border border-border bg-background px-4 py-3 font-sans text-body text-ivory outline-none transition-colors focus:border-gold";
 
+function Step({ number, title, children }: { number: number; title: string; children: React.ReactNode }) {
+  return (
+    <section className="rounded-card border border-gold/25 bg-white/[0.03] p-5 md:p-7">
+      <div className="flex items-center gap-3">
+        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-pill bg-gold font-sans text-sm font-semibold text-background">
+          {number}
+        </span>
+        <h2 className="font-display text-2xl text-ivory md:text-[1.75rem]">{title}</h2>
+      </div>
+      <div className="mt-5">{children}</div>
+    </section>
+  );
+}
+
 /**
- * The daily routine in one screen: type today's 22K rate (others optional),
- * save, then share the poster to WhatsApp status straight from the phone.
+ * The daily routine on one phone screen:
+ *   1. pick an ad video from the gallery
+ *   2. type today's rate
+ *   3. Done → the status video is made → Share to WhatsApp (status or chat)
  */
 export function RateDesk({ initialRates, today, storageReady, siteUrl }: RateDeskProps) {
   const router = useRouter();
   const [rates, setRates] = useState(initialRates);
-  // New day: start from the latest saved numbers so only changes need typing.
-  const [form, setForm] = useState<FormState>(() => ({
-    ...toForm(today, initialRates.find((r) => r.date === today) ?? initialRates[0]),
-    date: today,
-    note: initialRates.find((r) => r.date === today)?.note ?? "",
-  }));
-  const [format, setFormat] = useState<"story" | "square">("story");
-  const [busy, setBusy] = useState(false);
+  // New day: start from the latest numbers and video so only changes need typing.
+  const [form, setForm] = useState<FormState>(() => {
+    const saved = initialRates.find((r) => r.date === today);
+    return saved ? toForm(today, saved) : { ...toForm(today, initialRates[0]), date: today, note: "" };
+  });
+  const [busy, setBusy] = useState<"" | "saving" | "recording">("");
+  const [progress, setProgress] = useState(0);
   const [error, setError] = useState("");
-  const [savedFlash, setSavedFlash] = useState(false);
+  const [result, setResult] = useState<(StatusVideoResult & { url: string; key: string }) | null>(null);
+  const [canRecord, setCanRecord] = useState(true);
+  const [canShareFiles, setCanShareFiles] = useState(false);
+  const audioRef = useRef<AudioContext | null>(null);
+
+  useEffect(() => setCanRecord(canMakeStatusVideo()), []);
 
   const saved = rates.find((rate) => rate.date === form.date);
   const previous = rates.find((rate) => rate.date < form.date);
+  const ad = findAd(form.adId) ?? ADS[0];
+  const gold22 = toNumber(form.gold22);
+  const change = previous && gold22 ? gold22 - previous.gold22 : null;
+  const formKey = JSON.stringify(form);
+
   const dirty = useMemo(() => {
+    if (!saved) return true;
     const base = toForm(form.date, saved);
     return (Object.keys(base) as (keyof FormState)[]).some((key) => base[key].trim() !== form[key].trim());
   }, [form, saved]);
 
-  const gold22 = Number(form.gold22.replace(/,/g, ""));
-  const change = previous && gold22 > 0 ? gold22 - previous.gold22 : null;
+  const overlay = {
+    date: form.date,
+    gold22: gold22 ?? 0,
+    gold18: toNumber(form.gold18),
+    gold24: toNumber(form.gold24),
+    silver: toNumber(form.silver),
+    note: form.note.trim() || undefined,
+    change,
+  };
+
+  // A finished video belongs to the exact form it was made from.
+  const ready = result && result.key === formKey ? result : null;
+
+  useEffect(() => {
+    if (!ready) return;
+    setCanShareFiles(typeof navigator.canShare === "function" && navigator.canShare({ files: [ready.file] }));
+  }, [ready]);
+
+  useEffect(() => () => {
+    if (result) URL.revokeObjectURL(result.url);
+  }, [result]);
+
+  const update = (patch: Partial<FormState>) => {
+    setForm((current) => ({ ...current, ...patch }));
+    setError("");
+  };
 
   const pickDate = (date: string) => {
     const existing = rates.find((rate) => rate.date === date);
@@ -77,27 +140,72 @@ export function RateDesk({ initialRates, today, storageReady, siteUrl }: RateDes
     setError("");
   };
 
-  const set = (key: keyof FormState) => (event: React.ChangeEvent<HTMLInputElement>) =>
-    setForm({ ...form, [key]: event.target.value });
+  const done = async () => {
+    // Created inside the tap, so the browser lets the video's music be recorded.
+    if (!audioRef.current && typeof AudioContext !== "undefined") audioRef.current = new AudioContext();
+    void audioRef.current?.resume();
 
-  const save = async (event: React.FormEvent) => {
-    event.preventDefault();
-    setBusy(true);
     setError("");
-    const response = await fetch("/api/admin/rates", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(form),
-    });
-    const body = (await response.json().catch(() => ({}))) as { rate?: GoldRate; error?: string };
-    setBusy(false);
-    if (response.status === 401) return router.refresh();
-    if (!response.ok || !body.rate) return setError(body.error ?? "Could not save.");
-    const rate = body.rate;
-    setRates((list) => [rate, ...list.filter((r) => r.date !== rate.date)].sort((a, b) => b.date.localeCompare(a.date)));
-    setForm(toForm(rate.date, rate));
-    setSavedFlash(true);
-    window.setTimeout(() => setSavedFlash(false), 2500);
+    let rate = saved;
+    if (dirty) {
+      setBusy("saving");
+      const response = await fetch("/api/admin/rates", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
+      });
+      const body = (await response.json().catch(() => ({}))) as { rate?: GoldRate; error?: string };
+      if (response.status === 401) {
+        setBusy("");
+        return router.refresh();
+      }
+      if (!response.ok || !body.rate) {
+        setBusy("");
+        return setError(body.error ?? "Could not save.");
+      }
+      rate = body.rate;
+      const savedRate = body.rate;
+      setRates((list) =>
+        [savedRate, ...list.filter((r) => r.date !== savedRate.date)].sort((a, b) => b.date.localeCompare(a.date)),
+      );
+    }
+    if (!rate || !canRecord) {
+      setBusy("");
+      return;
+    }
+
+    setBusy("recording");
+    setProgress(0);
+    try {
+      const video = await makeStatusVideo({
+        clipUrl: adClipUrl(ad),
+        data: overlay,
+        fileName: `bright-gold-rate-${rate.date}`,
+        audio: audioRef.current ?? undefined,
+        onProgress: setProgress,
+      });
+      setResult({ ...video, url: URL.createObjectURL(video.file), key: formKey });
+    } catch (problem) {
+      setError((problem as Error).message);
+    }
+    setBusy("");
+  };
+
+  const shareVideo = async () => {
+    if (!ready) return;
+    try {
+      await navigator.share({ files: [ready.file] });
+    } catch (problem) {
+      if ((problem as Error).name !== "AbortError") downloadVideo();
+    }
+  };
+
+  const downloadVideo = () => {
+    if (!ready) return;
+    const link = document.createElement("a");
+    link.href = ready.url;
+    link.download = ready.file.name;
+    link.click();
   };
 
   const remove = async (date: string) => {
@@ -106,7 +214,7 @@ export function RateDesk({ initialRates, today, storageReady, siteUrl }: RateDes
     if (response.status === 401) return router.refresh();
     if (response.ok) {
       setRates((list) => list.filter((rate) => rate.date !== date));
-      if (form.date === date) setForm(toForm(date, undefined));
+      if (form.date === date) setForm(toForm(date, undefined, form.adId));
     }
   };
 
@@ -114,6 +222,8 @@ export function RateDesk({ initialRates, today, storageReady, siteUrl }: RateDes
     await fetch("/api/admin/login", { method: "DELETE" });
     router.refresh();
   };
+
+  const hasExtras = Boolean(form.gold18 || form.gold24 || form.silver || form.note);
 
   return (
     <div className="min-h-screen pb-24">
@@ -125,7 +235,7 @@ export function RateDesk({ initialRates, today, storageReady, siteUrl }: RateDes
           </div>
           <div className="flex items-center gap-5 font-sans text-sm">
             <a href="/gold-rate" target="_blank" className="text-muted transition-colors hover:text-ivory">
-              View public page
+              Public page
             </a>
             <button type="button" onClick={signOut} className="text-muted transition-colors hover:text-ivory">
               Sign out
@@ -134,8 +244,8 @@ export function RateDesk({ initialRates, today, storageReady, siteUrl }: RateDes
         </div>
       </header>
 
-      <main className="container-lux mt-10 grid grid-cols-[minmax(0,1fr)] gap-12 lg:grid-cols-[minmax(0,1fr)_420px]">
-        <div className="flex flex-col gap-12">
+      <main className="container-lux mt-8 grid grid-cols-[minmax(0,1fr)] gap-6 lg:grid-cols-[minmax(0,1fr)_400px] lg:gap-10">
+        <div className="flex flex-col gap-6">
           {!storageReady ? (
             <p className="rounded-md border border-[#F28B8B]/50 bg-[#F28B8B]/10 p-4 font-sans text-sm text-ivory">
               Saving is not set up on this deployment yet. Connect an Upstash Redis database to the Vercel project
@@ -143,171 +253,234 @@ export function RateDesk({ initialRates, today, storageReady, siteUrl }: RateDes
             </p>
           ) : null}
 
-          <form onSubmit={save} className="rounded-card border border-gold/25 bg-white/[0.03] p-6 md:p-8">
-            <div className="flex flex-col gap-1">
-              <span className="label-eyebrow">{form.date === today ? "Today's rate" : "Edit rate"}</span>
-              <h1 className="font-display text-display-m text-ivory">
-                {formatLongDate(form.date)} <span className="text-muted">· {formatWeekday(form.date)}</span>
-              </h1>
+          <div>
+            <p className="label-eyebrow">{form.date === today ? "Today" : "Editing"}</p>
+            <h1 className="mt-1 font-display text-display-m text-ivory">
+              {formatLongDate(form.date)} <span className="text-muted">· {formatWeekday(form.date)}</span>
+            </h1>
+          </div>
+
+          <Step number={1} title="Choose today's video">
+            <div className="grid grid-cols-3 gap-3 sm:grid-cols-4">
+              {ADS.map((item) => {
+                const selected = item.id === ad.id;
+                return (
+                  <button
+                    key={item.id}
+                    type="button"
+                    onClick={() => update({ adId: item.id })}
+                    aria-pressed={selected}
+                    className={`group relative aspect-[9/16] overflow-hidden rounded-md border-2 text-left transition-all ${
+                      selected ? "border-gold shadow-[0_0_24px_rgba(242,210,139,0.35)]" : "border-transparent opacity-80 hover:opacity-100"
+                    }`}
+                  >
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={adThumbUrl(item)} alt="" loading="lazy" className="absolute inset-0 h-full w-full object-cover" />
+                    <span className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/90 to-transparent px-2 pb-2 pt-8">
+                      <span className="block font-sans text-[12px] font-medium leading-tight text-ivory">{item.title}</span>
+                      <span className="block font-sans text-[11px] text-muted">{adLength(item)} sec</span>
+                    </span>
+                    {selected ? (
+                      <span className="absolute right-1.5 top-1.5 flex h-6 w-6 items-center justify-center rounded-pill bg-gold font-sans text-xs font-bold text-background">
+                        ✓
+                      </span>
+                    ) : null}
+                  </button>
+                );
+              })}
             </div>
+          </Step>
 
-            <label className="mt-6 flex max-w-[220px] flex-col gap-2">
-              <span className="font-sans text-caption uppercase tracking-[0.2em] text-muted">Date</span>
-              <input type="date" value={form.date} max={today} onChange={(e) => e.target.value && pickDate(e.target.value)} className={inputClass} />
-            </label>
-
-            <div className="mt-8 rounded-md border border-gold/60 bg-gold/[0.06] p-5">
-              <label className="flex flex-col gap-2">
-                <span className="font-sans text-caption uppercase tracking-[0.2em] text-gold">22K · 916 — per gram *</span>
-                <div className="flex items-center gap-3">
-                  <span className="font-display text-display-m text-gold">₹</span>
-                  <input
-                    inputMode="decimal"
-                    required
-                    placeholder="0"
-                    value={form.gold22}
-                    onChange={set("gold22")}
-                    className="w-full bg-transparent font-display text-display-l text-gold outline-none placeholder:text-gold/30"
-                  />
-                </div>
-              </label>
-              <div className="mt-2 flex flex-wrap gap-x-6 gap-y-1 font-sans text-sm">
-                <span className="text-ivory">
-                  1 pavan ({GRAMS_PER_PAVAN}g): {gold22 > 0 ? formatRupees(gold22 * GRAMS_PER_PAVAN) : "—"}
-                </span>
+          <Step number={2} title="Today's gold rate">
+            <label className="flex flex-col gap-2 rounded-md border border-gold/60 bg-gold/[0.06] p-4">
+              <span className="font-sans text-caption uppercase tracking-[0.2em] text-gold">22K · 916 — per gram</span>
+              <div className="flex items-center gap-3">
+                <span className="font-display text-display-m text-gold">₹</span>
+                <input
+                  inputMode="decimal"
+                  placeholder="0"
+                  value={form.gold22}
+                  onChange={(e) => update({ gold22: e.target.value })}
+                  className="w-full bg-transparent font-display text-display-l text-gold outline-none placeholder:text-gold/30"
+                />
+              </div>
+              <span className="flex flex-wrap gap-x-5 gap-y-1 font-sans text-sm">
+                <span className="text-ivory">1 pavan: {gold22 ? formatRupees(gold22 * GRAMS_PER_PAVAN) : "—"}</span>
                 {change !== null && previous ? (
                   <span className={change > 0 ? "text-[#7FD69B]" : change < 0 ? "text-[#F28B8B]" : "text-muted"}>
                     {change === 0 ? "Same as" : change > 0 ? `▲ ₹${formatAmount(change)} from` : `▼ ₹${formatAmount(-change)} from`}{" "}
                     {formatLongDate(previous.date)}
                   </span>
                 ) : null}
-              </div>
-            </div>
-
-            <div className="mt-6 grid gap-4 sm:grid-cols-3">
-              {FIELDS.map((field) => (
-                <label key={field.key} className="flex flex-col gap-2">
-                  <span className="font-sans text-caption uppercase tracking-[0.2em] text-muted">
-                    {field.label} <span className="normal-case tracking-normal">· {field.hint}</span>
-                  </span>
-                  <input inputMode="decimal" placeholder="optional" value={form[field.key]} onChange={set(field.key)} className={inputClass} />
-                </label>
-              ))}
-            </div>
-
-            <label className="mt-6 flex flex-col gap-2">
-              <span className="font-sans text-caption uppercase tracking-[0.2em] text-muted">
-                Poster line <span className="normal-case tracking-normal">· optional, e.g. &ldquo;0% wastage on bangles this week&rdquo;</span>
               </span>
-              <input maxLength={80} value={form.note} onChange={set("note")} className={inputClass} />
             </label>
 
-            {error ? <p className="mt-4 font-sans text-sm text-[#F28B8B]">{error}</p> : null}
-
-            <div className="mt-8 flex items-center gap-4">
-              <button type="submit" disabled={busy || !form.gold22 || (!dirty && Boolean(saved))} className="btn-primary disabled:opacity-50">
-                {busy ? "Saving…" : saved ? "Update rate & poster" : "Save rate & make poster"}
-              </button>
-              <span className="font-sans text-sm text-gold" aria-live="polite">
-                {savedFlash ? "Saved. The website shows it now." : saved && !dirty ? "Saved" : ""}
-              </span>
-            </div>
-          </form>
-
-          <section>
-            <h2 className="font-display text-2xl text-ivory">Recent rates</h2>
-            {rates.length === 0 ? (
-              <p className="mt-4 font-sans text-body text-muted">No rates saved yet.</p>
-            ) : (
-              <div className="mt-4 overflow-x-auto">
-                <table className="w-full min-w-[520px] border-collapse font-sans text-sm">
-                  <thead>
-                    <tr className="border-b border-border text-left text-caption uppercase tracking-[0.15em] text-muted">
-                      <th className="py-3 pr-4 font-normal">Date</th>
-                      <th className="py-3 pr-4 font-normal">22K / g</th>
-                      <th className="py-3 pr-4 font-normal">Pavan</th>
-                      <th className="py-3 pr-4 font-normal">Change</th>
-                      <th className="py-3 font-normal" />
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {rates.map((rate, index) => {
-                      const before = rates[index + 1];
-                      const diff = before ? rate.gold22 - before.gold22 : null;
-                      return (
-                        <tr key={rate.date} className={`border-b border-border/60 ${rate.date === form.date ? "bg-gold/[0.06]" : ""}`}>
-                          <td className="py-3 pr-4 text-ivory">{formatLongDate(rate.date)}</td>
-                          <td className="py-3 pr-4 text-gold">{formatRupees(rate.gold22)}</td>
-                          <td className="py-3 pr-4 text-ivory">{formatRupees(rate.gold22 * GRAMS_PER_PAVAN)}</td>
-                          <td className={`py-3 pr-4 ${diff && diff > 0 ? "text-[#7FD69B]" : diff && diff < 0 ? "text-[#F28B8B]" : "text-muted"}`}>
-                            {diff === null ? "—" : diff === 0 ? "0" : `${diff > 0 ? "▲" : "▼"} ${formatAmount(Math.abs(diff))}`}
-                          </td>
-                          <td className="py-3 text-right">
-                            <button type="button" onClick={() => pickDate(rate.date)} className="mr-4 text-muted hover:text-gold">
-                              Edit
-                            </button>
-                            <button type="button" onClick={() => remove(rate.date)} className="text-muted hover:text-[#F28B8B]">
-                              Delete
-                            </button>
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
+            <details className="group mt-4" open={hasExtras}>
+              <summary className="cursor-pointer list-none font-sans text-sm text-muted hover:text-ivory">
+                <span className="group-open:hidden">+ 18K, 24K, silver, offer line, other date (optional)</span>
+                <span className="hidden group-open:inline">− Optional extras</span>
+              </summary>
+              <div className="mt-4 grid grid-cols-3 gap-3">
+                {EXTRA_FIELDS.map((field) => (
+                  <label key={field.key} className="flex flex-col gap-1.5">
+                    <span className="font-sans text-caption uppercase tracking-[0.15em] text-muted">{field.label} / g</span>
+                    <input
+                      inputMode="decimal"
+                      placeholder="—"
+                      value={form[field.key]}
+                      onChange={(e) => update({ [field.key]: e.target.value })}
+                      className={inputClass}
+                    />
+                  </label>
+                ))}
               </div>
-            )}
-          </section>
+              <label className="mt-3 flex flex-col gap-1.5">
+                <span className="font-sans text-caption uppercase tracking-[0.15em] text-muted">Offer line</span>
+                <input
+                  maxLength={60}
+                  placeholder="e.g. 0% wastage on bangles this week"
+                  value={form.note}
+                  onChange={(e) => update({ note: e.target.value })}
+                  className={inputClass}
+                />
+              </label>
+              <label className="mt-3 flex max-w-[220px] flex-col gap-1.5">
+                <span className="font-sans text-caption uppercase tracking-[0.15em] text-muted">Date</span>
+                <input type="date" value={form.date} max={today} onChange={(e) => e.target.value && pickDate(e.target.value)} className={inputClass} />
+              </label>
+            </details>
+          </Step>
         </div>
 
-        <aside className="lg:sticky lg:top-24 lg:self-start">
-          <div className="flex items-center justify-between">
-            <h2 className="font-display text-2xl text-ivory">Poster</h2>
-            <div className="flex rounded-pill border border-border p-1 font-sans text-xs">
-              {(["story", "square"] as const).map((option) => (
-                <button
-                  key={option}
-                  type="button"
-                  onClick={() => setFormat(option)}
-                  className={`rounded-pill px-3 py-1.5 transition-colors ${format === option ? "bg-gold text-background" : "text-muted hover:text-ivory"}`}
-                >
-                  {option === "story" ? "Status 9:16" : "Square 1:1"}
-                </button>
-              ))}
-            </div>
+        {/* Preview + Done + Share. On phones this comes right after step 2. */}
+        <aside className="flex flex-col gap-4 lg:sticky lg:top-24 lg:row-span-2 lg:self-start">
+          <div className="flex items-center gap-3">
+            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-pill bg-gold font-sans text-sm font-semibold text-background">
+              3
+            </span>
+            <h2 className="font-display text-2xl text-ivory md:text-[1.75rem]">{ready ? "Share it" : "Preview & done"}</h2>
           </div>
 
-          {saved ? (
-            <>
-              <div className={`relative mx-auto mt-4 overflow-hidden rounded-md border border-gold/30 ${format === "story" ? "aspect-[9/16] max-w-[340px]" : "aspect-square max-w-[420px]"}`}>
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  key={posterUrl(saved, format)}
-                  src={posterUrl(saved, format)}
-                  alt={`Gold rate poster for ${formatLongDate(saved.date)}`}
-                  className={`h-full w-full object-cover transition-opacity ${dirty ? "opacity-40" : ""}`}
-                />
-                {dirty ? (
-                  <span className="absolute inset-x-4 top-1/2 -translate-y-1/2 rounded-md bg-background/90 p-3 text-center font-sans text-sm text-gold">
-                    Save to update the poster
-                  </span>
-                ) : null}
-              </div>
-              <div className="mt-5">
+          <div className="mx-auto w-full max-w-[300px] overflow-hidden rounded-md border border-gold/30 bg-black">
+            {ready ? (
+              <video src={ready.url} controls playsInline autoPlay muted loop className="aspect-[9/16] w-full" />
+            ) : (
+              <StatusPreview clipUrl={adClipUrl(ad)} data={overlay} className="aspect-[9/16] w-full" />
+            )}
+          </div>
+
+          {error ? <p className="font-sans text-sm text-[#F28B8B]">{error}</p> : null}
+
+          {ready ? (
+            <div className="flex flex-col gap-3">
+              <p className="text-center font-sans text-sm text-gold">
+                Saved · video ready{ready.withMusic ? " with music" : " (no music)"}
+                {ready.format === "webm" ? " · WebM: if WhatsApp refuses it, use the poster below" : ""}
+              </p>
+              {canShareFiles ? (
+                <button type="button" onClick={shareVideo} className="btn-primary w-full">
+                  Share to WhatsApp status / chat
+                </button>
+              ) : null}
+              <button type="button" onClick={downloadVideo} className={`${canShareFiles ? "btn-secondary" : "btn-primary"} w-full`}>
+                Download video
+              </button>
+              {!canShareFiles ? (
+                <p className="text-center font-sans text-xs text-muted">
+                  On a phone this button opens WhatsApp directly. On a computer, download and send it from WhatsApp.
+                </p>
+              ) : null}
+            </div>
+          ) : (
+            <button
+              type="button"
+              onClick={done}
+              disabled={Boolean(busy) || !gold22}
+              className="btn-primary relative w-full overflow-hidden disabled:opacity-60"
+            >
+              {busy === "recording" ? (
+                <span className="absolute inset-y-0 left-0 bg-ivory/40 transition-[width]" style={{ width: `${Math.round(progress * 100)}%` }} />
+              ) : null}
+              <span className="relative">
+                {busy === "saving"
+                  ? "Saving…"
+                  : busy === "recording"
+                    ? `Making video… ${Math.round(progress * 100)}%`
+                    : !gold22
+                      ? "Enter the 22K rate"
+                      : canRecord
+                        ? "Done — make status video"
+                        : "Done — save rate"}
+              </span>
+            </button>
+          )}
+          {busy === "recording" ? (
+            <p className="text-center font-sans text-xs text-muted">Keep this screen open — it records in real time ({adLength(ad)} sec).</p>
+          ) : null}
+          {!canRecord ? (
+            <p className="text-center font-sans text-xs text-muted">This browser cannot make videos; the poster image below still works.</p>
+          ) : null}
+
+          {saved && !dirty ? (
+            <details className="rounded-md border border-border p-4">
+              <summary className="cursor-pointer font-sans text-sm text-muted hover:text-ivory">Other ways to share</summary>
+              <div className="mt-4">
                 <SharePoster
-                  posterUrl={posterUrl(saved, format)}
+                  compact
+                  posterUrl={posterUrl(saved)}
                   fileName={posterFileName(saved)}
                   message={shareMessage(saved)}
                   pageUrl={`${siteUrl}/gold-rate`}
                 />
               </div>
-            </>
+            </details>
+          ) : null}
+        </aside>
+
+        <section className="lg:col-start-1">
+          <h2 className="font-display text-2xl text-ivory">Recent rates</h2>
+          {rates.length === 0 ? (
+            <p className="mt-4 font-sans text-body text-muted">No rates saved yet.</p>
           ) : (
-            <div className="mx-auto mt-4 flex aspect-[9/16] max-w-[340px] items-center justify-center rounded-md border border-dashed border-gold/30 p-8 text-center font-sans text-sm text-muted">
-              Save the rate for {formatLongDate(form.date)} to make its poster.
+            <div className="mt-4 overflow-x-auto">
+              <table className="w-full min-w-[520px] border-collapse font-sans text-sm">
+                <thead>
+                  <tr className="border-b border-border text-left text-caption uppercase tracking-[0.15em] text-muted">
+                    <th className="py-3 pr-4 font-normal">Date</th>
+                    <th className="py-3 pr-4 font-normal">22K / g</th>
+                    <th className="py-3 pr-4 font-normal">Change</th>
+                    <th className="py-3 pr-4 font-normal">Video</th>
+                    <th className="py-3 font-normal" />
+                  </tr>
+                </thead>
+                <tbody>
+                  {rates.map((rate, index) => {
+                    const before = rates[index + 1];
+                    const diff = before ? rate.gold22 - before.gold22 : null;
+                    return (
+                      <tr key={rate.date} className={`border-b border-border/60 ${rate.date === form.date ? "bg-gold/[0.06]" : ""}`}>
+                        <td className="py-3 pr-4 text-ivory">{formatLongDate(rate.date)}</td>
+                        <td className="py-3 pr-4 text-gold">{formatRupees(rate.gold22)}</td>
+                        <td className={`py-3 pr-4 ${diff && diff > 0 ? "text-[#7FD69B]" : diff && diff < 0 ? "text-[#F28B8B]" : "text-muted"}`}>
+                          {diff === null ? "—" : diff === 0 ? "0" : `${diff > 0 ? "▲" : "▼"} ${formatAmount(Math.abs(diff))}`}
+                        </td>
+                        <td className="py-3 pr-4 text-muted">{findAd(rate.adId)?.title ?? "—"}</td>
+                        <td className="py-3 text-right">
+                          <button type="button" onClick={() => pickDate(rate.date)} className="mr-4 text-muted hover:text-gold">
+                            Open
+                          </button>
+                          <button type="button" onClick={() => remove(rate.date)} className="text-muted hover:text-[#F28B8B]">
+                            Delete
+                          </button>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
             </div>
           )}
-        </aside>
+        </section>
       </main>
     </div>
   );

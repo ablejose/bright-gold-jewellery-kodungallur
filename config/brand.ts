@@ -1,5 +1,10 @@
 import type { BrandConfig } from "@/types/brand";
 
+// Source videos for the status-video gallery (see ratePoster.ads).
+const FILM = "https://res.cloudinary.com/nplfkyjy/video/upload/v1786453236/bright-gold/hero.mp4";
+const STORE_TOUR = "https://res.cloudinary.com/nplfkyjy/video/upload/v1786644396/bright-gold/video1.mp4";
+const TEAM = "https://res.cloudinary.com/nplfkyjy/video/upload/v1786644397/bright-gold/video2.mp4";
+
 /**
  * SINGLE SOURCE OF TRUTH.
  *
@@ -107,5 +112,16 @@ export const BRAND: BrandConfig = {
       "https://res.cloudinary.com/nplfkyjy/image/upload/v1786453228/bright-gold/store1.webp",
     strapline: "Kodungallur's Trusted Craftsmanship",
     website: "brightgoldkodungallur.com",
+    // Demo set cut from the brand film and store videos. Add the shop's own
+    // ads by uploading to Cloudinary and adding an entry here.
+    ads: [
+      { id: "necklace", title: "Necklace Elegance", video: FILM, start: 0, end: 4 },
+      { id: "ring", title: "Diamond Ring", video: FILM, start: 6.5, end: 13 },
+      { id: "bangle", title: "Gold Bangle", video: FILM, start: 17.5, end: 24.5 },
+      { id: "earrings", title: "Ruby Earrings", video: FILM, start: 26.5, end: 33.5 },
+      { id: "bridal", title: "Bridal Necklace", video: FILM, start: 36, end: 40 },
+      { id: "showroom", title: "Our Showroom", video: STORE_TOUR, start: 0, end: 8 },
+      { id: "team", title: "Our Team", video: TEAM, start: 0, end: 4 },
+    ],
   },
 };

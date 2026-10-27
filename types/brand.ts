@@ -98,4 +98,18 @@ export interface RatePosterConfig {
   strapline: string;
   /** Website shown in the poster footer, without https://. */
   website: string;
+  /** Gallery of short ad clips the admin picks from for the daily status video. */
+  ads: RateAd[];
+}
+
+/** One gallery ad: a segment of a Cloudinary video, cropped to 9:16 on the fly. */
+export interface RateAd {
+  /** Stable id stored with the day's rate. Never reuse an id for a different clip. */
+  id: string;
+  title: string;
+  /** Full Cloudinary video URL (…/video/upload/v…/name.mp4). */
+  video: string;
+  /** Segment start and end, in seconds. Keep it under ~15 s for a status. */
+  start: number;
+  end: number;
 }

@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
 import { isAdmin } from "@/lib/adminAuth";
 import { isIsoDate } from "@/lib/goldRate";
+import { findAd } from "@/lib/rateAds";
 import { deleteRate, saveRate } from "@/lib/rateStore";
 import type { GoldRate } from "@/types/goldRate";
 
@@ -38,6 +39,7 @@ export async function POST(request: Request) {
   if (bad) return NextResponse.json({ error: `Check the ${bad[0]} amount.` }, { status: 400 });
 
   const note = String(body.note ?? "").trim().slice(0, 80);
+  const ad = findAd(typeof body.adId === "string" ? body.adId : undefined);
   const rate: GoldRate = {
     date,
     gold22: fields.gold22 as number,
@@ -45,6 +47,7 @@ export async function POST(request: Request) {
     ...(fields.gold24 ? { gold24: fields.gold24 as number } : {}),
     ...(fields.silver ? { silver: fields.silver as number } : {}),
     ...(note ? { note } : {}),
+    ...(ad ? { adId: ad.id } : {}),
     updatedAt: new Date().toISOString(),
   };
 

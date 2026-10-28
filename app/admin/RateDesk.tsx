@@ -5,9 +5,9 @@ import { useRouter } from "next/navigation";
 import { BRAND } from "@/config/brand";
 import { SharePoster } from "@/components/SharePoster";
 import { formatAmount, formatLongDate, formatRupees, formatWeekday, sinceLabel } from "@/lib/goldRate";
-import { adClipUrl, adLength, adThumbUrl, findAd } from "@/lib/rateAds";
+import { adClipUrl, adLength, adThumbUrl, findMedia, mediaTitle, type RateMedia } from "@/lib/rateAds";
 import { posterFileName, posterUrl, shareMessage } from "@/lib/rateShare";
-import { canMakeStatusVideo, makeStatusVideo, type StatusVideoResult } from "@/lib/statusVideo";
+import { canMakeStatusVideo, makeStatusImage, makeStatusVideo, type StatusVideoResult } from "@/lib/statusVideo";
 import { GRAMS_PER_PAVAN, type GoldRate } from "@/types/goldRate";
 import { StatusPreview } from "./StatusPreview";
 
@@ -29,6 +29,8 @@ interface FormState {
 }
 
 const ADS = BRAND.ratePoster.ads;
+const PHOTOS = BRAND.ratePoster.photos;
+type Tab = RateMedia["kind"];
 
 const EXTRA_FIELDS: { key: "gold18" | "gold24" | "silver"; label: string }[] = [
   { key: "gold18", label: "18K" },
@@ -72,9 +74,9 @@ function Step({ number, title, children }: { number: number; title: string; chil
 
 /**
  * The daily routine on one phone screen:
- *   1. pick an ad video from the gallery
+ *   1. pick an ad video or a photo from the gallery (two tabs)
  *   2. type today's rate
- *   3. Done → the status video is made → Share to WhatsApp (status or chat)
+ *   3. Done → the status video / image is made → Share to WhatsApp (status or chat)
  */
 export function RateDesk({ initialRates, today, storageReady, siteUrl }: RateDeskProps) {
   const router = useRouter();
@@ -96,7 +98,9 @@ export function RateDesk({ initialRates, today, storageReady, siteUrl }: RateDes
 
   const saved = rates.find((rate) => rate.date === form.date);
   const previous = rates.find((rate) => rate.date < form.date);
-  const ad = findAd(form.adId) ?? ADS[0];
+  const media: RateMedia = findMedia(form.adId) ?? { kind: "video", ad: ADS[0] };
+  const [tab, setTab] = useState<Tab>(media.kind);
+  const isPhoto = media.kind === "photo";
   const gold22 = toNumber(form.gold22);
   const change = previous && gold22 ? gold22 - previous.gold22 : null;
   const formKey = JSON.stringify(form);
@@ -138,13 +142,15 @@ export function RateDesk({ initialRates, today, storageReady, siteUrl }: RateDes
   const pickDate = (date: string) => {
     const existing = rates.find((rate) => rate.date === date);
     setForm(existing ? toForm(date, existing) : { ...form, date, note: "" });
+    const kind = findMedia(existing?.adId)?.kind;
+    if (kind) setTab(kind);
     setError("");
   };
 
   const done = async () => {
     // Created inside the tap, so the browser lets the video's music be recorded.
-    if (!audioRef.current && typeof AudioContext !== "undefined") audioRef.current = new AudioContext();
-    void audioRef.current?.resume();
+    if (!isPhoto && !audioRef.current && typeof AudioContext !== "undefined") audioRef.current = new AudioContext();
+    if (!isPhoto) void audioRef.current?.resume();
 
     setError("");
     let rate = saved;
@@ -170,7 +176,7 @@ export function RateDesk({ initialRates, today, storageReady, siteUrl }: RateDes
         [savedRate, ...list.filter((r) => r.date !== savedRate.date)].sort((a, b) => b.date.localeCompare(a.date)),
       );
     }
-    if (!rate || !canRecord) {
+    if (!rate || (!isPhoto && !canRecord)) {
       setBusy("");
       return;
     }
@@ -178,14 +184,18 @@ export function RateDesk({ initialRates, today, storageReady, siteUrl }: RateDes
     setBusy("recording");
     setProgress(0);
     try {
-      const video = await makeStatusVideo({
-        clipUrl: adClipUrl(ad),
-        data: overlay,
-        fileName: `bright-gold-rate-${rate.date}`,
-        audio: audioRef.current ?? undefined,
-        onProgress: setProgress,
-      });
-      setResult({ ...video, url: URL.createObjectURL(video.file), key: formKey });
+      const fileName = `bright-gold-rate-${rate.date}`;
+      const made =
+        media.kind === "photo"
+          ? await makeStatusImage({ photoSrc: media.photo.src, data: overlay, fileName })
+          : await makeStatusVideo({
+              clipUrl: adClipUrl(media.ad),
+              data: overlay,
+              fileName,
+              audio: audioRef.current ?? undefined,
+              onProgress: setProgress,
+            });
+      setResult({ ...made, url: URL.createObjectURL(made.file), key: formKey });
     } catch (problem) {
       setError((problem as Error).message);
     }
@@ -261,10 +271,58 @@ export function RateDesk({ initialRates, today, storageReady, siteUrl }: RateDes
             </h1>
           </div>
 
-          <Step number={1} title="Choose today's video">
-            <div className="grid grid-cols-3 gap-3 sm:grid-cols-4">
+          <Step number={1} title={tab === "photo" ? "Choose today's image" : "Choose today's video"}>
+            <div role="tablist" className="mb-4 inline-flex rounded-pill border border-border p-1 font-sans text-sm">
+              {(
+                [
+                  ["video", `Videos (${ADS.length})`],
+                  ["photo", `Images (${PHOTOS.length})`],
+                ] as [Tab, string][]
+              ).map(([key, label]) => (
+                <button
+                  key={key}
+                  type="button"
+                  role="tab"
+                  aria-selected={tab === key}
+                  onClick={() => setTab(key)}
+                  className={`rounded-pill px-5 py-2 transition-colors ${tab === key ? "bg-gold text-background" : "text-muted hover:text-ivory"}`}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+
+            {tab === "photo" ? (
+              <div className="grid max-h-[62vh] grid-cols-3 gap-2.5 overflow-y-auto pr-1 sm:grid-cols-4">
+                {PHOTOS.map((item) => {
+                  const selected = item.id === form.adId;
+                  return (
+                    <button
+                      key={item.id}
+                      type="button"
+                      onClick={() => update({ adId: item.id })}
+                      aria-pressed={selected}
+                      title={item.title}
+                      className={`relative aspect-[36/31] overflow-hidden rounded-md border-2 transition-all ${
+                        selected ? "border-gold shadow-[0_0_24px_rgba(242,210,139,0.35)]" : "border-transparent opacity-85 hover:opacity-100"
+                      }`}
+                    >
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={item.src} alt={item.title} loading="lazy" className="absolute inset-0 h-full w-full object-cover" />
+                      {selected ? (
+                        <span className="absolute right-1.5 top-1.5 flex h-6 w-6 items-center justify-center rounded-pill bg-gold font-sans text-xs font-bold text-background">
+                          ✓
+                        </span>
+                      ) : null}
+                    </button>
+                  );
+                })}
+              </div>
+            ) : null}
+
+            <div className={`grid grid-cols-3 gap-3 sm:grid-cols-4 ${tab === "photo" ? "hidden" : ""}`}>
               {ADS.map((item) => {
-                const selected = item.id === ad.id;
+                const selected = item.id === form.adId;
                 return (
                   <button
                     key={item.id}
@@ -363,10 +421,17 @@ export function RateDesk({ initialRates, today, storageReady, siteUrl }: RateDes
           </div>
 
           <div className="mx-auto w-full max-w-[300px] overflow-hidden rounded-md border border-gold/30 bg-black">
-            {ready ? (
+            {ready && ready.format === "jpg" ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={ready.url} alt="Status image" className="aspect-[9/16] w-full" />
+            ) : ready ? (
               <video src={ready.url} controls playsInline autoPlay muted loop className="aspect-[9/16] w-full" />
             ) : (
-              <StatusPreview clipUrl={adClipUrl(ad)} data={overlay} className="aspect-[9/16] w-full" />
+              <StatusPreview
+                media={media.kind === "photo" ? { kind: "photo", src: media.photo.src } : { kind: "video", src: adClipUrl(media.ad) }}
+                data={overlay}
+                className="aspect-[9/16] w-full"
+              />
             )}
           </div>
 
@@ -375,7 +440,9 @@ export function RateDesk({ initialRates, today, storageReady, siteUrl }: RateDes
           {ready ? (
             <div className="flex flex-col gap-3">
               <p className="text-center font-sans text-sm text-gold">
-                Saved · video ready{ready.withMusic ? " with music" : " (no music)"}
+                {ready.format === "jpg"
+                  ? "Saved · image ready"
+                  : `Saved · video ready${ready.withMusic ? " with music" : " (no music)"}`}
                 {ready.format === "webm" ? " · WebM: if WhatsApp refuses it, use the poster below" : ""}
               </p>
               {canShareFiles ? (
@@ -384,7 +451,7 @@ export function RateDesk({ initialRates, today, storageReady, siteUrl }: RateDes
                 </button>
               ) : null}
               <button type="button" onClick={downloadVideo} className={`${canShareFiles ? "btn-secondary" : "btn-primary"} w-full`}>
-                Download video
+                {ready.format === "jpg" ? "Download image" : "Download video"}
               </button>
               {!canShareFiles ? (
                 <p className="text-center font-sans text-xs text-muted">
@@ -406,19 +473,25 @@ export function RateDesk({ initialRates, today, storageReady, siteUrl }: RateDes
                 {busy === "saving"
                   ? "Saving…"
                   : busy === "recording"
-                    ? `Making video… ${Math.round(progress * 100)}%`
+                    ? isPhoto
+                      ? "Making image…"
+                      : `Making video… ${Math.round(progress * 100)}%`
                     : !gold22
                       ? "Enter the 22K rate"
-                      : canRecord
-                        ? "Done — make status video"
-                        : "Done — save rate"}
+                      : isPhoto
+                        ? "Done — make status image"
+                        : canRecord
+                          ? "Done — make status video"
+                          : "Done — save rate"}
               </span>
             </button>
           )}
-          {busy === "recording" ? (
-            <p className="text-center font-sans text-xs text-muted">Keep this screen open — it records in real time ({adLength(ad)} sec).</p>
+          {busy === "recording" && media.kind === "video" ? (
+            <p className="text-center font-sans text-xs text-muted">
+              Keep this screen open — it records in real time ({adLength(media.ad)} sec).
+            </p>
           ) : null}
-          {!canRecord ? (
+          {!canRecord && !isPhoto ? (
             <p className="text-center font-sans text-xs text-muted">This browser cannot make videos; the poster image below still works.</p>
           ) : null}
 
@@ -450,7 +523,7 @@ export function RateDesk({ initialRates, today, storageReady, siteUrl }: RateDes
                     <th className="py-3 pr-4 font-normal">Date</th>
                     <th className="py-3 pr-4 font-normal">22K / g</th>
                     <th className="py-3 pr-4 font-normal">Change</th>
-                    <th className="py-3 pr-4 font-normal">Video</th>
+                    <th className="py-3 pr-4 font-normal">Video / image</th>
                     <th className="py-3 font-normal" />
                   </tr>
                 </thead>
@@ -465,7 +538,7 @@ export function RateDesk({ initialRates, today, storageReady, siteUrl }: RateDes
                         <td className={`py-3 pr-4 ${diff && diff > 0 ? "text-[#7FD69B]" : diff && diff < 0 ? "text-[#F28B8B]" : "text-muted"}`}>
                           {diff === null ? "—" : diff === 0 ? "0" : `${diff > 0 ? "▲" : "▼"} ${formatAmount(Math.abs(diff))}`}
                         </td>
-                        <td className="py-3 pr-4 text-muted">{findAd(rate.adId)?.title ?? "—"}</td>
+                        <td className="py-3 pr-4 text-muted">{mediaTitle(rate.adId) ?? "—"}</td>
                         <td className="py-3 text-right">
                           <button type="button" onClick={() => pickDate(rate.date)} className="mr-4 text-muted hover:text-gold">
                             Open

@@ -3,7 +3,7 @@
 import { BRAND } from "@/config/brand";
 import { displayPhone } from "@/lib/format";
 import { formatAmount, formatFullDate } from "@/lib/goldRate";
-import { STATUS_HEIGHT as H, STATUS_WIDTH as W } from "@/lib/rateAds";
+import { PHOTO_HEIGHT, STATUS_HEIGHT as H, STATUS_WIDTH as W } from "@/lib/rateAds";
 import { GRAMS_PER_PAVAN } from "@/types/goldRate";
 
 /**
@@ -133,34 +133,44 @@ function runs(ctx: CanvasRenderingContext2D, parts: Run[], y: number) {
  */
 export function drawStatusFrame(
   ctx: CanvasRenderingContext2D,
-  video: HTMLVideoElement | null,
+  source: HTMLVideoElement | HTMLImageElement | null,
   data: StatusOverlay,
   t: number,
   fonts: Fonts,
 ) {
   ctx.fillStyle = `rgb(${BG})`;
   ctx.fillRect(0, 0, W, H);
-  if (video && video.readyState >= 2 && video.videoWidth) {
-    const scale = Math.max(W / video.videoWidth, H / video.videoHeight);
-    const vw = video.videoWidth * scale;
-    const vh = video.videoHeight * scale;
-    ctx.drawImage(video, (W - vw) / 2, (H - vh) / 2, vw, vh);
+  const photo = source instanceof HTMLImageElement;
+  if (photo && source.complete && source.naturalWidth) {
+    // Gallery photos are pre-cropped to exactly this band.
+    ctx.drawImage(source, 0, 0, W, PHOTO_HEIGHT);
+  } else if (source instanceof HTMLVideoElement && source.readyState >= 2 && source.videoWidth) {
+    const scale = Math.max(W / source.videoWidth, H / source.videoHeight);
+    const vw = source.videoWidth * scale;
+    const vh = source.videoHeight * scale;
+    ctx.drawImage(source, (W - vw) / 2, (H - vh) / 2, vw, vh);
   }
   ctx.textAlign = "center";
   ctx.textBaseline = "alphabetic";
 
-  // Header: brand over a soft dark fade.
-  const top = ctx.createLinearGradient(0, 0, 0, 280);
-  top.addColorStop(0, `rgba(${BG},0.8)`);
+  // Header: brand over a dark fade. Photos are often bright gold edge to edge,
+  // so they get a deeper fade and a soft shadow behind the name.
+  const top = ctx.createLinearGradient(0, 0, 0, photo ? 300 : 280);
+  top.addColorStop(0, `rgba(${BG},${photo ? 0.92 : 0.8})`);
+  top.addColorStop(photo ? 0.5 : 0.6, `rgba(${BG},${photo ? 0.55 : 0.3})`);
   top.addColorStop(1, `rgba(${BG},0)`);
   ctx.fillStyle = top;
-  ctx.fillRect(0, 0, W, 280);
+  ctx.fillRect(0, 0, W, 300);
+  ctx.save();
+  ctx.shadowColor = "rgba(0,0,0,0.85)";
+  ctx.shadowBlur = 18;
   ctx.fillStyle = GOLD;
   ctx.font = `700 56px ${fonts.display}`;
   ctx.fillText(BRAND.businessName, W / 2, 92);
-  ctx.fillStyle = "rgba(246,243,240,0.82)";
+  ctx.fillStyle = "rgba(246,243,240,0.85)";
   ctx.font = `600 15px ${fonts.sans}`;
   spaced(ctx, BRAND.ratePoster.strapline.toUpperCase(), 132, 5);
+  ctx.restore();
   if (data.note) {
     ctx.fillStyle = GOLD;
     ctx.font = `600 30px ${fonts.display}`;
@@ -315,7 +325,43 @@ export interface StatusVideoResult {
   file: File;
   /** False when the browser would not play the music (e.g. iPhone after a wait). */
   withMusic: boolean;
-  format: "mp4" | "webm";
+  format: "mp4" | "webm" | "jpg";
+}
+
+/**
+ * The still image is drawn at this moment of the animation: the panel is fully
+ * in and the gold light sits across the middle of the price.
+ */
+export const STILL_FRAME_TIME = 2;
+
+export function loadImage(src: string): Promise<HTMLImageElement> {
+  return new Promise((resolve, reject) => {
+    const image = new Image();
+    image.onload = () => resolve(image);
+    image.onerror = () => reject(new Error("The photo could not be loaded."));
+    image.src = src;
+  });
+}
+
+/** Status image: the chosen photo with the rate panel, as a 720x1280 JPEG. */
+export async function makeStatusImage(options: {
+  photoSrc: string;
+  data: StatusOverlay;
+  fileName: string;
+}): Promise<StatusVideoResult> {
+  const [fonts, image] = await Promise.all([loadStatusFonts(), loadImage(options.photoSrc)]);
+  const canvas = document.createElement("canvas");
+  canvas.width = W;
+  canvas.height = H;
+  const ctx = canvas.getContext("2d") as CanvasRenderingContext2D;
+  drawStatusFrame(ctx, image, options.data, STILL_FRAME_TIME, fonts);
+  const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, "image/jpeg", 0.92));
+  if (!blob) throw new Error("Could not make the image.");
+  return {
+    file: new File([blob], `${options.fileName}.jpg`, { type: "image/jpeg" }),
+    withMusic: false,
+    format: "jpg",
+  };
 }
 
 /**

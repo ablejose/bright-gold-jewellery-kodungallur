@@ -12,7 +12,7 @@ export interface GoldRate {
   silver?: number;
   /** Optional short line shown on the poster (e.g. an offer). */
   note?: string;
-  /** Gallery ad chosen for the day's status video (BRAND.ratePoster.ads id). */
+  /** Gallery item chosen for the day's status: a ratePoster.ads (video) or .photos id. */
   adId?: string;
   /** ISO timestamp of the last save; used to bust poster caches. */
   updatedAt: string;

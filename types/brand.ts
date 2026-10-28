@@ -100,6 +100,20 @@ export interface RatePosterConfig {
   website: string;
   /** Gallery of short ad clips the admin picks from for the daily status video. */
   ads: RateAd[];
+  /** Gallery of photos for a still status image (same rate panel, no motion). */
+  photos: RatePhoto[];
+}
+
+/**
+ * One gallery photo, pre-cropped to the poster's photo window (720x620): the
+ * jewellery sits in the clear middle, between the shop name and the rate panel.
+ */
+export interface RatePhoto {
+  /** Stable id stored with the day's rate. Never reuse an id for a different photo. */
+  id: string;
+  title: string;
+  /** Same-origin path under /public, so the canvas can export it. */
+  src: string;
 }
 
 /** One gallery ad: a segment of a Cloudinary video, cropped to 9:16 on the fly. */

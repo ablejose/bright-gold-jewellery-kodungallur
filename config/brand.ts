@@ -123,5 +123,42 @@ export const BRAND: BrandConfig = {
       { id: "showroom", title: "Our Showroom", video: STORE_TOUR, start: 0, end: 8 },
       { id: "team", title: "Our Team", video: TEAM, start: 0, end: 4 },
     ],
+    // The best 30 of the shop's photos (Oct 2026), cropped in public/rate-photos
+    // so logos, clips and phone bars are out of frame. Best first.
+    photos: [
+      "Bridal Collection",
+      "Bridal Set",
+      "Bridal Box",
+      "Temple Necklace Set",
+      "Layered Necklaces",
+      "Kerala Bridal Set",
+      "Bridal Necklace",
+      "Our Showroom",
+      "Gold Bangles",
+      "Antique Ruby Necklace",
+      "Lakshmi Pendant",
+      "Ruby Long Chain",
+      "Layered Necklace",
+      "Floral Necklace",
+      "Palakka Necklace",
+      "Kerala Necklace",
+      "Leaf Necklace",
+      "Grand Haram",
+      "Ruby Layered Set",
+      "Pendant Necklace",
+      "Crescent Necklace",
+      "Stone Necklace",
+      "Bangle Stack",
+      "Carved Bangles",
+      "Kasu Mala",
+      "Classic Necklace",
+      "Bridal Haram",
+      "Flower Pendant Chain",
+      "Delicate Chains",
+      "Necklace Set",
+    ].map((title, index) => {
+      const n = String(index + 1).padStart(2, "0");
+      return { id: `photo-${n}`, title, src: `/rate-photos/photo-${n}.jpg` };
+    }),
   },
 };

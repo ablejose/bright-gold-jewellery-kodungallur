@@ -5,15 +5,24 @@ import { cookies } from "next/headers";
  * Single-password admin login for the shop staff.
  *
  * The password lives only in the ADMIN_PASSWORD environment variable. The
- * session cookie holds an HMAC of it, so changing the password in Vercel signs
- * everyone out. No user database is needed for one shop.
+ * session cookie holds an HMAC of it keyed with ADMIN_SESSION_SECRET (a long
+ * random value that is never shown), so a short PIN cannot be used to forge a
+ * cookie offline, and changing either value in Vercel signs everyone out. No
+ * user database is needed for one shop.
+ *
+ * In production the secret is required; without it the admin stays closed
+ * rather than falling back to a cookie anyone could compute from the PIN.
  */
 
 export const ADMIN_COOKIE = "bg_admin";
 const SESSION_DAYS = 30;
 
+function sessionSecret(): string {
+  return process.env.ADMIN_SESSION_SECRET ?? "";
+}
+
 function sessionToken(password: string): string {
-  return createHmac("sha256", password).update("bright-gold-admin-session").digest("hex");
+  return createHmac("sha256", `${sessionSecret()}:${password}`).update("bright-gold-admin-session").digest("hex");
 }
 
 function safeEqual(a: string, b: string): boolean {
@@ -23,7 +32,8 @@ function safeEqual(a: string, b: string): boolean {
 }
 
 export function adminConfigured(): boolean {
-  return Boolean(process.env.ADMIN_PASSWORD);
+  if (!process.env.ADMIN_PASSWORD) return false;
+  return process.env.NODE_ENV !== "production" || sessionSecret().length >= 16;
 }
 
 export function checkPassword(candidate: string): boolean {

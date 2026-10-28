@@ -27,10 +27,14 @@ export function Hero() {
 
       <div className="container-lux relative z-10">
         <div className="max-w-2xl">
-          <span className="logo-glow mb-5 block" aria-hidden="true">
-            <BrandMark priority className="h-16 md:h-20" />
-          </span>
-          <h1 className="font-display text-display-xl text-gold-sweep">Bright Gold</h1>
+          {/* Emblem and name on one line; the emblem's height tracks the title's
+              fluid font size (clamp(3rem, 8vw, 5.5rem)) so they always line up. */}
+          <div className="flex items-center gap-4 md:gap-6">
+            <span className="logo-glow shrink-0" aria-hidden="true">
+              <BrandMark priority className="!h-[clamp(2.7rem,7.2vw,5rem)]" />
+            </span>
+            <h1 className="font-display text-display-xl text-gold-sweep">Bright Gold</h1>
+          </div>
           <p className="mt-2 font-sans text-sm tracking-wide text-gold-glow">{BRAND.tagline}</p>
           <p className="mt-4 max-w-xl font-sans text-body-lg text-gold">
             3 Decades of purity, elegance, and unmatched trust in Kodungallur. Celebrate your golden moments with Bright Gold Jewellery.

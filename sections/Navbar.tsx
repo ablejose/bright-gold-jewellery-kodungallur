@@ -5,7 +5,6 @@ import Link from "next/link";
 import { useScrolled } from "@/hooks/useScrolled";
 
 const LINKS = [
-  { label: "Gold Rate", href: "#gold-rate" },
   { label: "About", href: "#about" },
   { label: "Visit Store", href: "#visit-store" },
   { label: "Contact", href: "#contact" },

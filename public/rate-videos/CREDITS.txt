@@ -1,19 +1,20 @@
 Status-video gallery clips (each trimmed to 4-8 s and cropped to 720x620).
 
 Bright Gold's own footage (with music):
-  necklace, ring, bangle, earrings   - Bright Gold brand film
-  showroom                           - Bright Gold store video
+  bangle, earrings   - Bright Gold brand film
+  showroom           - Bright Gold store video
 
 Stock footage, free for commercial use, no attribution required:
   Pexels licence  https://www.pexels.com/license/
-    temple-bride 37690650 · jhumka-glow 10835737 · lotus-pendant 34465658
-    silk-bride 40080130 · gold-showcase 36338911 · bangle-showcase 36353836
-    kundan-bridal 11122318 · necklace-collection 8855209 · bride-bangles 31155576
-    kerala-bride 31155566 · jhumka-display 8844354 · chandbali 8844346
+    temple-gold-bride 37783633 · jasmine-bride 38201169 · bridal-veil 38190356
+    silk-bride 40080130 · silk-saree-outdoors 31059809 · kundan-bride 28520947
+    red-lehenga-bride 29575338 · gold-showcase 36338911 · bangle-showcase 36353836
+    necklace-table 6874763 · jewellery-counter 40574116 · emerald-necklace 37224780
+    lotus-pendant 34465658 · kundan-bridal 11122318 · necklace-collection 8855209
+    bride-bangles 31155576 · jhumka-display 8844354 · chandbali 8844346
     bangle-rack 8844368 · necklace-set 5704899 · handcrafted 6262804
-    gold-earrings 6806974 · maang-tikka 9328446 · kundan-necklace 9583626
-    bridal-choker 11122340 · bangles-rings 11122341 · bridal-hands 11122323
-    gold-closeup 5815082 · gold-bracelet 36546100 · gold-beads 8844339
+    maang-tikka 9328446 · bridal-choker 11122340 · bangles-rings 11122341
+    gold-bracelet 36546100 · gold-beads 8844339
     (https://www.pexels.com/video/<number>/)
   Mixkit Stock Video Free License  https://mixkit.co/license/#videoFree
     polki-bracelet 34611

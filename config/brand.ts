@@ -114,7 +114,7 @@ export const BRAND: BrandConfig = {
     // Status-video gallery: clips in public/rate-videos/<id>.mp4 (+ <id>.jpg),
     // already cut to the 720x620 window. The clips are silent: every video gets
     // the same light background music (public/rate-music) when it is recorded.
-    // The first five are the shop's own footage/photos; the rest are stock clips
+    // The first eight are the shop's own footage/photos; the rest are stock clips
     // (see CREDITS.txt there).
     // Rules from the shop: whole pieces at a natural distance, never an
     // extreme close-up of gold, and no faces (Silk Saree Bride Outdoors is
@@ -125,18 +125,18 @@ export const BRAND: BrandConfig = {
       { id: "showroom", title: "Our Showroom", length: 8, source: "Bright Gold store video" },
       { id: "emerald-bridal-set", title: "Emerald Bridal Set", length: 7, source: "Bright Gold photo, slow zoom" },
       { id: "lakshmi-haram", title: "Lakshmi Haram", length: 7, source: "Bright Gold photo, slow zoom" },
+      { id: "kerala-haram-set", title: "Kerala Gold Haram Set", length: 7, source: "Bright Gold photo, slow zoom" },
+      { id: "gold-bridal-belt-set", title: "Gold Bridal Set & Belt", length: 7, source: "Bright Gold photo, slow zoom" },
+      { id: "light-flower-necklace", title: "Light Flower Necklace", length: 7, source: "Bright Gold photo, slow zoom" },
       { id: "pendant-petals", title: "Pendant on Rose Petals", length: 7, source: "Pexels 37771539" },
       { id: "layered-chains", title: "Layered Gold Chains", length: 5, source: "Pexels 6469640" },
-      { id: "pendant-necklace", title: "Oval Pendant Necklace", length: 7, source: "Pexels 6961972" },
       { id: "gold-diamond-rings", title: "Gold & Diamond Rings", length: 7, source: "Pexels 34369899" },
-      { id: "solitaire-ring", title: "Solitaire Ring", length: 7, source: "Pexels 4004214" },
       { id: "rose-gold-ring", title: "Rose Gold Ring", length: 9, source: "Pexels 31757666" },
       { id: "bridal-set-roses", title: "Bridal Set with Roses", length: 7, source: "Pexels 11353208" },
       { id: "gold-showcase", title: "Gold Showcase", length: 6.5, source: "Pexels 36338911" },
       { id: "bangle-showcase", title: "Bangle Showcase", length: 6.5, source: "Pexels 36353836" },
       { id: "necklace-table", title: "Necklaces on Display", length: 7, source: "Pexels 6874763" },
       { id: "kundan-bridal", title: "Kundan Bridal", length: 7, source: "Pexels 11122318" },
-      { id: "haldi-bangles", title: "Haldi Bangles", length: 7, source: "Pexels 29766214" },
       { id: "jewellery-box", title: "Jewellery Box", length: 7, source: "Pexels 8087659" },
       { id: "lotus-pendant", title: "Lotus Pendant", length: 7, source: "Pexels 34465658" },
       { id: "polki-bracelet", title: "Polki Bracelet", length: 6, source: "Mixkit 34611" },

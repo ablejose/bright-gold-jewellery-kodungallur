@@ -7,7 +7,13 @@ import { SharePoster } from "@/components/SharePoster";
 import { formatAmount, formatLongDate, formatRupees, formatWeekday, sinceLabel } from "@/lib/goldRate";
 import { adClipUrl, adLength, adThumbUrl, findMedia, mediaTitle, type RateMedia } from "@/lib/rateAds";
 import { posterFileName, posterUrl, shareMessage } from "@/lib/rateShare";
-import { canMakeStatusVideo, makeStatusImage, makeStatusVideo, type StatusVideoResult } from "@/lib/statusVideo";
+import {
+  canMakeStatusVideo,
+  DEFAULT_MUSIC_URL,
+  makeStatusImage,
+  makeStatusVideo,
+  type StatusVideoResult,
+} from "@/lib/statusVideo";
 import { GRAMS_PER_PAVAN, type GoldRate } from "@/types/goldRate";
 import { StatusPreview } from "./StatusPreview";
 
@@ -192,8 +198,9 @@ export function RateDesk({ initialRates, today, storageReady, siteUrl }: RateDes
               clipUrl: adClipUrl(media.ad),
               data: overlay,
               fileName,
-              // Only clips with music get an audio track; stock clips are silent.
-              audio: media.ad.music ? (audioRef.current ?? undefined) : undefined,
+              // Every video gets the same light background music.
+              audio: audioRef.current ?? undefined,
+              musicUrl: DEFAULT_MUSIC_URL,
               onProgress: setProgress,
             });
       setResult({ ...made, url: URL.createObjectURL(made.file), key: formKey });

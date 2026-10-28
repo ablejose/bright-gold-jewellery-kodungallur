@@ -407,16 +407,22 @@ export async function makeStatusImage(options: {
   };
 }
 
+/** The light background music every status video gets (Schumann, public domain). */
+export const DEFAULT_MUSIC_URL = "/rate-music/default.mp3";
+
 /**
  * Record the status video in real time (as long as the clip, ~4–8 s).
- * `audio` must be an AudioContext created inside the tap that started this,
- * or the music is left out. Keep the screen on while it records.
+ * The clips themselves are silent; `musicUrl` is mixed in from one shared
+ * file, with a short fade in and out. `audio` must be an AudioContext created
+ * inside the tap that started this, or the music is left out. Keep the screen
+ * on while it records.
  */
 export async function makeStatusVideo(options: {
   clipUrl: string;
   data: StatusOverlay;
   fileName: string;
   audio?: AudioContext;
+  musicUrl?: string;
   onProgress?: (fraction: number) => void;
 }): Promise<StatusVideoResult> {
   const format = pickFormat();
@@ -444,51 +450,55 @@ export async function makeStatusVideo(options: {
   drawStatusFrame(ctx, video, options.data, 0, fonts);
 
   const stream = canvas.captureStream(30);
+  video.muted = true; // the clips carry no sound; the music is mixed in below
+
+  // Music: decode the shared file, play it through a gain node into a stream
+  // destination, and record that stream next to the picture.
   let withMusic = false;
-  let gain: GainNode | null = null;
-  if (options.audio) {
+  let music: { source: AudioBufferSourceNode; gain: GainNode } | null = null;
+  if (options.audio && options.musicUrl) {
     try {
-      await options.audio.resume();
-      const node = options.audio.createMediaElementSource(video);
-      gain = options.audio.createGain();
+      // A browser that refuses to start audio would leave resume() pending
+      // forever; give up on the music after 1.5 s rather than hang the video.
+      await Promise.race([options.audio.resume(), new Promise((resolve) => setTimeout(resolve, 1500))]);
+      if (options.audio.state !== "running") throw new Error("audio not allowed");
+      const encoded = await fetch(options.musicUrl).then((r) => r.arrayBuffer());
+      const buffer = await options.audio.decodeAudioData(encoded);
+      const source = options.audio.createBufferSource();
+      source.buffer = buffer;
+      const gain = options.audio.createGain();
+      gain.gain.value = 0;
       const out = options.audio.createMediaStreamDestination();
-      node.connect(gain).connect(out);
+      source.connect(gain).connect(out);
       out.stream.getAudioTracks().forEach((track) => stream.addTrack(track));
+      music = { source, gain };
       withMusic = true;
     } catch {
-      withMusic = false;
+      withMusic = false; // record silently rather than fail
     }
   }
-  video.muted = !withMusic;
 
   const recorder = new MediaRecorder(stream, { mimeType: format.mimeType, videoBitsPerSecond: 6_000_000 });
   const chunks: Blob[] = [];
   recorder.ondataavailable = (event) => event.data.size && chunks.push(event.data);
   const stopped = new Promise<void>((resolve) => (recorder.onstop = () => resolve()));
 
-  try {
-    await video.play();
-  } catch {
-    // Unmuted playback refused (no recent tap): record silently instead.
-    video.muted = true;
-    withMusic = false;
-    stream.getAudioTracks().forEach((track) => stream.removeTrack(track));
-    await video.play();
-  }
+  await video.play();
   video.pause();
   video.currentTime = 0;
 
   const duration = video.duration;
-  if (gain && options.audio) {
-    // Soft music fade in/out so the cut segment does not start or end abruptly.
-    const now = options.audio.currentTime;
-    gain.gain.setValueAtTime(0, now);
-    gain.gain.linearRampToValueAtTime(1, now + 0.4);
-    gain.gain.setValueAtTime(1, now + Math.max(duration - 0.6, 0.5));
-    gain.gain.linearRampToValueAtTime(0, now + duration);
-  }
-
   recorder.start(250);
+  if (music && options.audio) {
+    // Soft fade in and out so the excerpt never starts or ends abruptly.
+    const now = options.audio.currentTime;
+    music.gain.gain.setValueAtTime(0, now);
+    music.gain.gain.linearRampToValueAtTime(1, now + 0.5);
+    music.gain.gain.setValueAtTime(1, now + Math.max(duration - 0.9, 0.6));
+    music.gain.gain.linearRampToValueAtTime(0, now + duration);
+    music.source.start(now);
+    music.source.stop(now + duration + 0.2);
+  }
   await video.play();
   await new Promise<void>((resolve) => {
     const tick = () => {

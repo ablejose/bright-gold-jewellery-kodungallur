@@ -1,20 +1,22 @@
-Status-video gallery clips (each trimmed to 4-8 s and cropped to 720x620).
+Status-video gallery clips (each trimmed to 4-9 s and cropped to 720x620).
+The clips are silent; every status video gets the same background music
+(see ../rate-music/CREDITS.txt).
 
-Bright Gold's own footage (with music):
+Bright Gold's own footage and photos:
   bangle, earrings   - Bright Gold brand film
   showroom           - Bright Gold store video
+  emerald-bridal-set, lakshmi-haram - Bright Gold product photos with a slow zoom
 
 Stock footage, free for commercial use, no attribution required:
   Pexels licence  https://www.pexels.com/license/
-    bridal-set-roses 11353208 · silk-saree-outdoors 31059809 · gold-showcase 36338911
-    bangle-showcase 36353836 · necklace-table 6874763 · jewellery-case 8706305
-    traditional-necklace 30159551 · kundan-bridal 11122318 · haldi-bangles 29766214
-    mehndi-bangles 7685143 · jewellery-box 8087659 · ring-box 38647468
-    lotus-pendant 34465658 · necklace-collection 8855209 · jhumka-display 8844354
-    chandbali 8844346 · bangle-rack 8844368 · necklace-set 5704899
-    handcrafted 6262804 · bracelet-moment 7685040 · bracelet-silk 7685050
-    mehndi-rings 9797021 · golden-rings 8184066 · bangles-rings 11122341
-    gold-bracelet 36546100 · gold-beads 8844339
+    pendant-petals 37771539 · layered-chains 6469640 · pendant-necklace 6961972
+    gold-diamond-rings 34369899 · solitaire-ring 4004214 · rose-gold-ring 31757666
+    bridal-set-roses 11353208 · gold-showcase 36338911 · bangle-showcase 36353836
+    necklace-table 6874763 · kundan-bridal 11122318 · haldi-bangles 29766214
+    jewellery-box 8087659 · lotus-pendant 34465658 · necklace-collection 8855209
+    jhumka-display 8844354 · chandbali 8844346 · bangle-rack 8844368
+    necklace-set 5704899 · handcrafted 6262804 · mehndi-rings 9797021
+    bangles-rings 11122341 · gold-bracelet 36546100 · gold-beads 8844339
     (https://www.pexels.com/video/<number>/)
   Mixkit Stock Video Free License  https://mixkit.co/license/#videoFree
     polki-bracelet 34611

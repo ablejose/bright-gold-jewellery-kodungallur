@@ -112,27 +112,32 @@ export const BRAND: BrandConfig = {
       "Near Kalpaka Weddings, North Nada, Kodungallur",
     ],
     // Status-video gallery: clips in public/rate-videos/<id>.mp4 (+ <id>.jpg),
-    // already cut to the 720x620 window. The first three are the shop's own
-    // footage with music; the rest are stock clips (see CREDITS.txt there).
+    // already cut to the 720x620 window. The clips are silent: every video gets
+    // the same light background music (public/rate-music) when it is recorded.
+    // The first five are the shop's own footage/photos; the rest are stock clips
+    // (see CREDITS.txt there).
     // Rules from the shop: whole pieces at a natural distance, never an
     // extreme close-up of gold, and no faces (Silk Saree Bride Outdoors is
     // the one exception they chose to keep).
     ads: [
-      { id: "bangle", title: "Gold Bangle", length: 7, source: "Bright Gold brand film", music: true },
-      { id: "earrings", title: "Ruby Earrings", length: 7, source: "Bright Gold brand film", music: true },
-      { id: "showroom", title: "Our Showroom", length: 8, source: "Bright Gold store video", music: true },
+      { id: "bangle", title: "Gold Bangle", length: 7, source: "Bright Gold brand film" },
+      { id: "earrings", title: "Ruby Earrings", length: 7, source: "Bright Gold brand film" },
+      { id: "showroom", title: "Our Showroom", length: 8, source: "Bright Gold store video" },
+      { id: "emerald-bridal-set", title: "Emerald Bridal Set", length: 7, source: "Bright Gold photo, slow zoom" },
+      { id: "lakshmi-haram", title: "Lakshmi Haram", length: 7, source: "Bright Gold photo, slow zoom" },
+      { id: "pendant-petals", title: "Pendant on Rose Petals", length: 7, source: "Pexels 37771539" },
+      { id: "layered-chains", title: "Layered Gold Chains", length: 5, source: "Pexels 6469640" },
+      { id: "pendant-necklace", title: "Oval Pendant Necklace", length: 7, source: "Pexels 6961972" },
+      { id: "gold-diamond-rings", title: "Gold & Diamond Rings", length: 7, source: "Pexels 34369899" },
+      { id: "solitaire-ring", title: "Solitaire Ring", length: 7, source: "Pexels 4004214" },
+      { id: "rose-gold-ring", title: "Rose Gold Ring", length: 9, source: "Pexels 31757666" },
       { id: "bridal-set-roses", title: "Bridal Set with Roses", length: 7, source: "Pexels 11353208" },
-      { id: "silk-saree-outdoors", title: "Silk Saree Bride Outdoors", length: 5, source: "Pexels 31059809" },
       { id: "gold-showcase", title: "Gold Showcase", length: 6.5, source: "Pexels 36338911" },
       { id: "bangle-showcase", title: "Bangle Showcase", length: 6.5, source: "Pexels 36353836" },
       { id: "necklace-table", title: "Necklaces on Display", length: 7, source: "Pexels 6874763" },
-      { id: "jewellery-case", title: "Jewellery Case", length: 7, source: "Pexels 8706305" },
-      { id: "traditional-necklace", title: "Traditional Necklace", length: 4, source: "Pexels 30159551" },
       { id: "kundan-bridal", title: "Kundan Bridal", length: 7, source: "Pexels 11122318" },
       { id: "haldi-bangles", title: "Haldi Bangles", length: 7, source: "Pexels 29766214" },
-      { id: "mehndi-bangles", title: "Mehndi & Bangles", length: 7, source: "Pexels 7685143" },
       { id: "jewellery-box", title: "Jewellery Box", length: 7, source: "Pexels 8087659" },
-      { id: "ring-box", title: "Ring in Velvet Box", length: 7, source: "Pexels 38647468" },
       { id: "lotus-pendant", title: "Lotus Pendant", length: 7, source: "Pexels 34465658" },
       { id: "polki-bracelet", title: "Polki Bracelet", length: 6, source: "Mixkit 34611" },
       { id: "necklace-collection", title: "Necklace Collection", length: 7, source: "Pexels 8855209" },
@@ -141,10 +146,7 @@ export const BRAND: BrandConfig = {
       { id: "bangle-rack", title: "Gold Bangles", length: 7, source: "Pexels 8844368" },
       { id: "necklace-set", title: "Necklace Set", length: 7, source: "Pexels 5704899" },
       { id: "handcrafted", title: "Handcrafted", length: 7, source: "Pexels 6262804" },
-      { id: "bracelet-moment", title: "Bracelet Moment", length: 7, source: "Pexels 7685040" },
-      { id: "bracelet-silk", title: "Bracelet on Silk", length: 7, source: "Pexels 7685050" },
       { id: "mehndi-rings", title: "Mehndi & Rings", length: 7, source: "Pexels 9797021" },
-      { id: "golden-rings", title: "Golden Rings", length: 7, source: "Pexels 8184066" },
       { id: "bangles-rings", title: "Bangles & Rings", length: 7, source: "Pexels 11122341" },
       { id: "gold-bracelet", title: "Gold Bracelet", length: 7, source: "Pexels 36546100" },
       { id: "gold-beads", title: "Gold Beads", length: 7, source: "Pexels 8844339" },

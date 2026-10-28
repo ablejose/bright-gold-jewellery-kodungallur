@@ -130,6 +130,4 @@ export interface RateAd {
   length: number;
   /** Where the footage came from (licence record). */
   source: string;
-  /** True when the clip carries music that should go into the status video. */
-  music?: boolean;
 }

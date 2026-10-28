@@ -118,7 +118,17 @@ function SmallRate({ label, value }: { label: string; value: number }) {
   );
 }
 
-function Poster({ rate, previous, format }: { rate: GoldRate | null; previous: GoldRate | null; format: Format }) {
+function Poster({
+  rate,
+  previous,
+  format,
+  logoSrc,
+}: {
+  rate: GoldRate | null;
+  previous: GoldRate | null;
+  format: Format;
+  logoSrc: string;
+}) {
   const { width, height } = SIZES[format];
   const story = format === "story";
   const date = rate?.date ?? todayIST();
@@ -164,8 +174,13 @@ function Poster({ rate, previous, format }: { rate: GoldRate | null; previous: G
           marginTop: story ? -150 : 0,
         }}
       >
-        <div style={{ display: "flex", fontFamily: "Display", fontWeight: 700, fontSize: story ? 92 : 72, color: GOLD, letterSpacing: 1 }}>
-          {BRAND.businessName}
+        <div style={{ display: "flex", alignItems: "center", gap: story ? 24 : 20 }}>
+          {/* Emblem beside the name; PNG is 3x its drawn size, so it stays sharp. */}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={logoSrc} width={story ? 98 : 84} height={story ? 81 : 70} alt="" />
+          <div style={{ display: "flex", fontFamily: "Display", fontWeight: 700, fontSize: story ? 84 : 70, color: GOLD, letterSpacing: 1 }}>
+            {BRAND.businessName}
+          </div>
         </div>
         <div style={{ display: "flex", fontFamily: "Sans", fontWeight: 600, fontSize: story ? 24 : 20, letterSpacing: 9, color: MUTED, marginTop: 4 }}>
           {BRAND.ratePoster.strapline.toUpperCase()}
@@ -254,10 +269,10 @@ function Poster({ rate, previous, format }: { rate: GoldRate | null; previous: G
             <span key={phone}>{phone}</span>
           ))}
         </div>
-        <div style={{ display: "flex", gap: story ? 28 : 20, fontFamily: "Sans", fontSize: story ? 24 : 19, color: MUTED, marginTop: story ? 16 : 10 }}>
-          <span>{`North Nada & West Nada, ${BRAND.city}`}</span>
-          <span>·</span>
-          <span>{BRAND.ratePoster.website}</span>
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: story ? 10 : 6, fontFamily: "Sans", fontSize: story ? 24 : 19, color: MUTED, marginTop: story ? 16 : 10 }}>
+          {BRAND.ratePoster.addressLines.map((line) => (
+            <span key={line}>{line}</span>
+          ))}
         </div>
         <div style={{ display: "flex", fontFamily: "Sans", fontSize: story ? 18 : 15, color: GOLD_DEEP, marginTop: story ? 14 : 8 }}>
           Rates are per gram, exclusive of making charges and GST.
@@ -278,7 +293,8 @@ export async function GET(request: Request) {
     .then((response) => response.json())
     .catch(() => ({ rate: null, previous: null }))) as { rate: GoldRate | null; previous: GoldRate | null };
 
-  const response = new ImageResponse(<Poster rate={rate} previous={previous} format={format} />, {
+  const logoSrc = new URL("/brand/logo-emblem.png", request.url).href;
+  const response = new ImageResponse(<Poster rate={rate} previous={previous} format={format} logoSrc={logoSrc} />, {
     ...SIZES[format],
     fonts: await loadFonts(),
   });

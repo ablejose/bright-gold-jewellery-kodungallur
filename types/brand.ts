@@ -98,6 +98,8 @@ export interface RatePosterConfig {
   strapline: string;
   /** Website shown in the poster footer, without https://. */
   website: string;
+  /** Address lines printed on the poster, one per line, top to bottom. */
+  addressLines: string[];
   /** Gallery of short ad clips the admin picks from for the daily status video. */
   ads: RateAd[];
   /** Gallery of photos for a still status image (same rate panel, no motion). */

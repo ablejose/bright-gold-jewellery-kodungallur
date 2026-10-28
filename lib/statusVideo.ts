@@ -57,11 +57,33 @@ function pageFonts(): Fonts {
 
 let fontsReady: Promise<Fonts> | null = null;
 
-/** Load the exact weights the overlay uses before drawing with them. */
+/**
+ * The Bright Gold emblem: a transparent PNG cut from the shop's own logo, kept
+ * at ~3.4x the size it is drawn so downscaling stays crisp. Same-origin, so it
+ * never taints the canvas the video is recorded from.
+ */
+const LOGO_SRC = "/brand/logo-emblem.png";
+const LOGO_HEIGHT = 54;
+let logoImage: HTMLImageElement | null = null;
+
+function loadLogo(): Promise<void> {
+  return new Promise((resolve) => {
+    const image = new Image();
+    image.onload = () => {
+      logoImage = image;
+      resolve();
+    };
+    image.onerror = () => resolve(); // draw without the emblem rather than fail
+    image.src = LOGO_SRC;
+  });
+}
+
+/** Load the exact weights and the logo the overlay uses before drawing with them. */
 export function loadStatusFonts(): Promise<Fonts> {
   if (!fontsReady) {
     const fonts = pageFonts();
     fontsReady = Promise.all([
+      loadLogo(),
       document.fonts.load(`700 100px ${fonts.display}`),
       document.fonts.load(`600 40px ${fonts.display}`),
       document.fonts.load(`700 96px ${fonts.sans}`),
@@ -171,6 +193,16 @@ export function drawStatusFrame(
   ctx.fillStyle = GOLD;
   ctx.font = `700 56px ${fonts.display}`;
   ctx.fillText(BRAND.businessName, W / 2, 92);
+  if (logoImage) {
+    // Emblem just left of the name, level with its capitals.
+    const nameLeft = W / 2 - ctx.measureText(BRAND.businessName).width / 2;
+    const height = LOGO_HEIGHT;
+    const width = (logoImage.naturalWidth / logoImage.naturalHeight) * height;
+    ctx.shadowBlur = 0;
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = "high";
+    ctx.drawImage(logoImage, Math.max(nameLeft - 14 - width, 26), 40, width, height);
+  }
   ctx.fillStyle = "rgba(246,243,240,0.85)";
   ctx.font = `600 15px ${fonts.sans}`;
   spaced(ctx, BRAND.ratePoster.strapline.toUpperCase(), 132, 5);
@@ -194,6 +226,10 @@ export function drawStatusFrame(
   ctx.fillRect(0, 430, W, 160);
   ctx.fillStyle = `rgba(${BG},0.94)`;
   ctx.fillRect(0, 589, W, H - 589 + 140);
+
+  // The backdrop above is fixed; everything below moves up 32 px to make room
+  // for the second address line at the bottom.
+  ctx.translate(0, -32);
 
   ctx.fillStyle = GOLD;
   ctx.font = `600 20px ${fonts.sans}`;
@@ -295,9 +331,12 @@ export function drawStatusFrame(
   ctx.fillStyle = IVORY;
   ctx.font = `600 22px ${fonts.sans}`;
   ctx.fillText(phones.join("     ·     "), W / 2, 1218);
+  // Addresses: one line each, stacked, with the same breathing room as the rest.
   ctx.fillStyle = MUTED;
-  ctx.font = `400 15px ${fonts.sans}`;
-  ctx.fillText(`North Nada & West Nada, ${BRAND.city}   ·   ${BRAND.ratePoster.website}`, W / 2, 1245);
+  ctx.font = `400 16px ${fonts.sans}`;
+  BRAND.ratePoster.addressLines.forEach((line, index) => {
+    ctx.fillText(line, W / 2, 1248 + index * 26, W - 80);
+  });
   ctx.restore();
 
   // Gold frame on top of everything.

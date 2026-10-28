@@ -107,6 +107,10 @@ export const BRAND: BrandConfig = {
       "https://res.cloudinary.com/nplfkyjy/image/upload/v1786453228/bright-gold/store1.webp",
     strapline: "Kodungallur's Trusted Craftsmanship",
     website: "brightgoldkodungallur.com",
+    addressLines: [
+      "Sreekumarasamajam Building, West Nada, Kodungallur",
+      "Near Kalpaka Weddings, North Nada, Kodungallur",
+    ],
     // Status-video gallery: clips in public/rate-videos/<id>.mp4 (+ <id>.jpg),
     // already cut to the 720x620 window. The first three are the shop's own
     // footage with music; the rest are stock clips (see CREDITS.txt there).

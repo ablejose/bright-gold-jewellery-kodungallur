@@ -116,14 +116,18 @@ export interface RatePhoto {
   src: string;
 }
 
-/** One gallery ad: a segment of a Cloudinary video, cropped to 9:16 on the fly. */
+/**
+ * One gallery clip, stored in the repo at public/rate-videos/<id>.mp4 with a
+ * still at <id>.jpg, already trimmed and cropped to the 720x620 window.
+ */
 export interface RateAd {
-  /** Stable id stored with the day's rate. Never reuse an id for a different clip. */
+  /** Stable id (and file name) stored with the day's rate. Never reuse an id for a different clip. */
   id: string;
   title: string;
-  /** Full Cloudinary video URL (…/video/upload/v…/name.mp4). */
-  video: string;
-  /** Segment start and end, in seconds. Keep it under ~15 s for a status. */
-  start: number;
-  end: number;
+  /** Seconds; the status video is this long. */
+  length: number;
+  /** Where the footage came from (licence record). */
+  source: string;
+  /** True when the clip carries music that should go into the status video. */
+  music?: boolean;
 }

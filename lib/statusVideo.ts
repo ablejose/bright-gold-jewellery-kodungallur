@@ -140,24 +140,28 @@ export function drawStatusFrame(
 ) {
   ctx.fillStyle = `rgb(${BG})`;
   ctx.fillRect(0, 0, W, H);
-  const photo = source instanceof HTMLImageElement;
-  if (photo && source.complete && source.naturalWidth) {
-    // Gallery photos are pre-cropped to exactly this band.
-    ctx.drawImage(source, 0, 0, W, PHOTO_HEIGHT);
-  } else if (source instanceof HTMLVideoElement && source.readyState >= 2 && source.videoWidth) {
-    const scale = Math.max(W / source.videoWidth, H / source.videoHeight);
-    const vw = source.videoWidth * scale;
-    const vh = source.videoHeight * scale;
-    ctx.drawImage(source, (W - vw) / 2, (H - vh) / 2, vw, vh);
+  // Gallery clips and photos are pre-cut to the 720x620 window at the top;
+  // cover-fit anyway in case a file comes in a slightly different size.
+  const [sw, sh, ready] =
+    source instanceof HTMLImageElement
+      ? [source.naturalWidth, source.naturalHeight, source.complete]
+      : source instanceof HTMLVideoElement
+        ? [source.videoWidth, source.videoHeight, source.readyState >= 2]
+        : [0, 0, false];
+  if (source && ready && sw && sh) {
+    const scale = Math.max(W / sw, PHOTO_HEIGHT / sh);
+    const cw = W / scale;
+    const ch = PHOTO_HEIGHT / scale;
+    ctx.drawImage(source, (sw - cw) / 2, (sh - ch) / 2, cw, ch, 0, 0, W, PHOTO_HEIGHT);
   }
   ctx.textAlign = "center";
   ctx.textBaseline = "alphabetic";
 
-  // Header: brand over a dark fade. Photos are often bright gold edge to edge,
-  // so they get a deeper fade and a soft shadow behind the name.
-  const top = ctx.createLinearGradient(0, 0, 0, photo ? 300 : 280);
-  top.addColorStop(0, `rgba(${BG},${photo ? 0.92 : 0.8})`);
-  top.addColorStop(photo ? 0.5 : 0.6, `rgba(${BG},${photo ? 0.55 : 0.3})`);
+  // Header: brand over a deep dark fade with a soft shadow behind the name,
+  // so it stays readable over bright gold jewellery.
+  const top = ctx.createLinearGradient(0, 0, 0, 300);
+  top.addColorStop(0, `rgba(${BG},0.92)`);
+  top.addColorStop(0.5, `rgba(${BG},0.55)`);
   top.addColorStop(1, `rgba(${BG},0)`);
   ctx.fillStyle = top;
   ctx.fillRect(0, 0, W, 300);

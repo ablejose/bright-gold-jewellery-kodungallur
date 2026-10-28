@@ -1,10 +1,5 @@
 import type { BrandConfig } from "@/types/brand";
 
-// Source videos for the status-video gallery (see ratePoster.ads).
-const FILM = "https://res.cloudinary.com/nplfkyjy/video/upload/v1786453236/bright-gold/hero.mp4";
-const STORE_TOUR = "https://res.cloudinary.com/nplfkyjy/video/upload/v1786644396/bright-gold/video1.mp4";
-const TEAM = "https://res.cloudinary.com/nplfkyjy/video/upload/v1786644397/bright-gold/video2.mp4";
-
 /**
  * SINGLE SOURCE OF TRUTH.
  *
@@ -112,16 +107,40 @@ export const BRAND: BrandConfig = {
       "https://res.cloudinary.com/nplfkyjy/image/upload/v1786453228/bright-gold/store1.webp",
     strapline: "Kodungallur's Trusted Craftsmanship",
     website: "brightgoldkodungallur.com",
-    // Demo set cut from the brand film and store videos. Add the shop's own
-    // ads by uploading to Cloudinary and adding an entry here.
+    // Status-video gallery: clips in public/rate-videos/<id>.mp4 (+ <id>.jpg),
+    // already cut to the 720x620 window. The first five are the shop's own
+    // footage with music; the rest are stock clips (see CREDITS.txt there).
     ads: [
-      { id: "necklace", title: "Necklace Elegance", video: FILM, start: 0, end: 4 },
-      { id: "ring", title: "Diamond Ring", video: FILM, start: 6.5, end: 13 },
-      { id: "bangle", title: "Gold Bangle", video: FILM, start: 17.5, end: 24.5 },
-      { id: "earrings", title: "Ruby Earrings", video: FILM, start: 26.5, end: 33.5 },
-      { id: "bridal", title: "Bridal Necklace", video: FILM, start: 36, end: 40 },
-      { id: "showroom", title: "Our Showroom", video: STORE_TOUR, start: 0, end: 8 },
-      { id: "team", title: "Our Team", video: TEAM, start: 0, end: 4 },
+      { id: "necklace", title: "Necklace Elegance", length: 4, source: "Bright Gold brand film", music: true },
+      { id: "ring", title: "Diamond Ring", length: 6.5, source: "Bright Gold brand film", music: true },
+      { id: "bangle", title: "Gold Bangle", length: 7, source: "Bright Gold brand film", music: true },
+      { id: "earrings", title: "Ruby Earrings", length: 7, source: "Bright Gold brand film", music: true },
+      { id: "showroom", title: "Our Showroom", length: 8, source: "Bright Gold store video", music: true },
+      { id: "temple-bride", title: "Temple Jewellery Bride", length: 7, source: "Pexels 37690650" },
+      { id: "jhumka-glow", title: "Jhumka Glow", length: 7, source: "Pexels 10835737" },
+      { id: "lotus-pendant", title: "Lotus Pendant", length: 7, source: "Pexels 34465658" },
+      { id: "silk-bride", title: "Silk Saree Bride", length: 5, source: "Pexels 40080130" },
+      { id: "gold-showcase", title: "Gold Showcase", length: 6.5, source: "Pexels 36338911" },
+      { id: "bangle-showcase", title: "Bangle Showcase", length: 6.5, source: "Pexels 36353836" },
+      { id: "kundan-bridal", title: "Kundan Bridal", length: 7, source: "Pexels 11122318" },
+      { id: "polki-bracelet", title: "Polki Bracelet", length: 6, source: "Mixkit 34611" },
+      { id: "necklace-collection", title: "Necklace Collection", length: 7, source: "Pexels 8855209" },
+      { id: "bride-bangles", title: "Bride's Bangles", length: 7, source: "Pexels 31155576" },
+      { id: "kerala-bride", title: "Kerala Bride", length: 5, source: "Pexels 31155566" },
+      { id: "jhumka-display", title: "Jhumka Display", length: 7, source: "Pexels 8844354" },
+      { id: "chandbali", title: "Chandbali Earrings", length: 7, source: "Pexels 8844346" },
+      { id: "bangle-rack", title: "Gold Bangles", length: 7, source: "Pexels 8844368" },
+      { id: "necklace-set", title: "Necklace Set", length: 7, source: "Pexels 5704899" },
+      { id: "handcrafted", title: "Handcrafted", length: 7, source: "Pexels 6262804" },
+      { id: "gold-earrings", title: "Gold Earrings", length: 6, source: "Pexels 6806974" },
+      { id: "maang-tikka", title: "Maang Tikka", length: 6, source: "Pexels 9328446" },
+      { id: "kundan-necklace", title: "Bridal Necklace", length: 5, source: "Pexels 9583626" },
+      { id: "bridal-choker", title: "Bridal Choker", length: 7, source: "Pexels 11122340" },
+      { id: "bangles-rings", title: "Bangles & Rings", length: 7, source: "Pexels 11122341" },
+      { id: "bridal-hands", title: "Bridal Hands", length: 7, source: "Pexels 11122323" },
+      { id: "gold-closeup", title: "Gold Close-up", length: 6, source: "Pexels 5815082" },
+      { id: "gold-bracelet", title: "Gold Bracelet", length: 7, source: "Pexels 36546100" },
+      { id: "gold-beads", title: "Gold Beads", length: 7, source: "Pexels 8844339" },
     ],
     // The best 30 of the shop's photos (Oct 2026), cropped in public/rate-photos
     // so logos, clips and phone bars are out of frame. Best first.

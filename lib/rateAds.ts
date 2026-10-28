@@ -2,9 +2,10 @@ import { BRAND } from "@/config/brand";
 import type { RateAd, RatePhoto } from "@/types/brand";
 
 /**
- * Cloudinary URLs for the status-video gallery. Each ad is a segment of a
- * longer video, trimmed (so_/eo_) and cropped to 9:16 on the fly, so the shop
- * only ever uploads full videos.
+ * The status gallery: clips in public/rate-videos and photos in
+ * public/rate-photos, both pre-cut to the 720x620 window at the top of the
+ * status. Served from the site itself (same origin), so the canvas can record
+ * them without any cross-origin setup.
  */
 
 export const STATUS_WIDTH = 720;
@@ -14,21 +15,14 @@ export const PHOTO_HEIGHT = 620;
 
 export type RateMedia = { kind: "video"; ad: RateAd } | { kind: "photo"; photo: RatePhoto };
 
-function transform(ad: RateAd, extra: string): string {
-  return ad.video.replace("/upload/", `/upload/so_${ad.start},eo_${ad.end},c_fill,g_center,${extra}/`);
-}
-
-/** Full-size 9:16 clip with its music, used to make the status video. */
+/** The clip (with music, for the shop's own footage) used to make the status video. */
 export function adClipUrl(ad: RateAd): string {
-  return transform(ad, `w_${STATUS_WIDTH},h_${STATUS_HEIGHT},q_auto`);
+  return `/rate-videos/${ad.id}.mp4`;
 }
 
 /** Still frame from the middle of the clip for the gallery card. */
 export function adThumbUrl(ad: RateAd): string {
-  const middle = Math.round(((ad.start + ad.end) / 2) * 10) / 10;
-  return ad.video
-    .replace("/upload/", `/upload/so_${middle},c_fill,g_center,w_270,h_480,q_auto/`)
-    .replace(/\.mp4$/, ".jpg");
+  return `/rate-videos/${ad.id}.jpg`;
 }
 
 export function findAd(id: string | undefined): RateAd | undefined {
@@ -53,5 +47,5 @@ export function mediaTitle(id: string | undefined): string | undefined {
 }
 
 export function adLength(ad: RateAd): number {
-  return Math.round((ad.end - ad.start) * 10) / 10;
+  return ad.length;
 }

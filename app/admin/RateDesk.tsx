@@ -192,7 +192,8 @@ export function RateDesk({ initialRates, today, storageReady, siteUrl }: RateDes
               clipUrl: adClipUrl(media.ad),
               data: overlay,
               fileName,
-              audio: audioRef.current ?? undefined,
+              // Only clips with music get an audio track; stock clips are silent.
+              audio: media.ad.music ? (audioRef.current ?? undefined) : undefined,
               onProgress: setProgress,
             });
       setResult({ ...made, url: URL.createObjectURL(made.file), key: formKey });
@@ -320,7 +321,9 @@ export function RateDesk({ initialRates, today, storageReady, siteUrl }: RateDes
               </div>
             ) : null}
 
-            <div className={`grid grid-cols-3 gap-3 sm:grid-cols-4 ${tab === "photo" ? "hidden" : ""}`}>
+            <div
+              className={`grid max-h-[62vh] grid-cols-3 gap-2.5 overflow-y-auto pr-1 sm:grid-cols-4 ${tab === "photo" ? "hidden" : ""}`}
+            >
               {ADS.map((item) => {
                 const selected = item.id === form.adId;
                 return (
@@ -329,15 +332,16 @@ export function RateDesk({ initialRates, today, storageReady, siteUrl }: RateDes
                     type="button"
                     onClick={() => update({ adId: item.id })}
                     aria-pressed={selected}
-                    className={`group relative aspect-[9/16] overflow-hidden rounded-md border-2 text-left transition-all ${
-                      selected ? "border-gold shadow-[0_0_24px_rgba(242,210,139,0.35)]" : "border-transparent opacity-80 hover:opacity-100"
+                    title={item.title}
+                    className={`group relative aspect-[36/31] overflow-hidden rounded-md border-2 text-left transition-all ${
+                      selected ? "border-gold shadow-[0_0_24px_rgba(242,210,139,0.35)]" : "border-transparent opacity-85 hover:opacity-100"
                     }`}
                   >
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img src={adThumbUrl(item)} alt="" loading="lazy" className="absolute inset-0 h-full w-full object-cover" />
-                    <span className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/90 to-transparent px-2 pb-2 pt-8">
-                      <span className="block font-sans text-[12px] font-medium leading-tight text-ivory">{item.title}</span>
-                      <span className="block font-sans text-[11px] text-muted">{adLength(item)} sec</span>
+                    <span className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/90 to-transparent px-1.5 pb-1 pt-5">
+                      <span className="block truncate font-sans text-[11px] font-medium leading-tight text-ivory">{item.title}</span>
+                      <span className="block font-sans text-[10px] text-muted">{adLength(item)} sec</span>
                     </span>
                     {selected ? (
                       <span className="absolute right-1.5 top-1.5 flex h-6 w-6 items-center justify-center rounded-pill bg-gold font-sans text-xs font-bold text-background">
@@ -442,7 +446,7 @@ export function RateDesk({ initialRates, today, storageReady, siteUrl }: RateDes
               <p className="text-center font-sans text-sm text-gold">
                 {ready.format === "jpg"
                   ? "Saved · image ready"
-                  : `Saved · video ready${ready.withMusic ? " with music" : " (no music)"}`}
+                  : `Saved · video ready${ready.withMusic ? " with music" : ""}`}
                 {ready.format === "webm" ? " · WebM: if WhatsApp refuses it, use the poster below" : ""}
               </p>
               {canShareFiles ? (

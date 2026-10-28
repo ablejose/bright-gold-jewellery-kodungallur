@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import { BRAND } from "@/config/brand";
+import { BrandMark } from "@/components/BrandMark";
 
 /**
  * Full-screen brand loading overlay.
@@ -54,6 +55,9 @@ export function LoadingScreen() {
         fading ? "pointer-events-none opacity-0" : "opacity-100"
       }`}
     >
+      <span className="logo-glow" aria-hidden="true">
+        <BrandMark priority className="h-24 md:h-28" />
+      </span>
       <span className="px-6 text-center font-display text-display-m font-medium tracking-tight text-gold-sweep">
         Bright Gold
       </span>

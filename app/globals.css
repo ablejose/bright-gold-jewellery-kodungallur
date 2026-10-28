@@ -138,6 +138,22 @@ body {
   animation: gold-glow-pulse 3.2s ease-in-out infinite;
 }
 
+/* Soft golden glow around the emblem on the loading screen and hero. */
+@keyframes logo-glow-pulse {
+  0%,
+  100% {
+    filter: drop-shadow(0 0 10px rgba(242, 210, 139, 0.22));
+  }
+  50% {
+    filter: drop-shadow(0 0 22px rgba(242, 210, 139, 0.45));
+  }
+}
+
+.logo-glow {
+  display: inline-block;
+  animation: logo-glow-pulse 3.2s ease-in-out infinite;
+}
+
 /* Loading dots that light up strictly one at a time (sequential). */
 @keyframes dot-appear {
   0% {

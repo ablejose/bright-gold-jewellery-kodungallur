@@ -1,5 +1,6 @@
 import { BRAND } from "@/config/brand";
 import { Button } from "@/components/Button";
+import { BrandMark } from "@/components/BrandMark";
 import { telHref } from "@/lib/format";
 
 /**
@@ -26,6 +27,9 @@ export function Hero() {
 
       <div className="container-lux relative z-10">
         <div className="max-w-2xl">
+          <span className="logo-glow mb-5 block" aria-hidden="true">
+            <BrandMark priority className="h-16 md:h-20" />
+          </span>
           <h1 className="font-display text-display-xl text-gold-sweep">Bright Gold</h1>
           <p className="mt-2 font-sans text-sm tracking-wide text-gold-glow">{BRAND.tagline}</p>
           <p className="mt-4 max-w-xl font-sans text-body-lg text-gold">

@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { BRAND } from "@/config/brand";
 import { Reveal } from "@/components/Reveal";
 import { SharePoster } from "@/components/SharePoster";
@@ -62,7 +61,7 @@ export async function GoldRate() {
         </Reveal>
 
         <Reveal>
-          <div className="mt-8 flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+          <div className="mt-8">
             <SharePoster
               compact
               posterUrl={posterUrl(rate)}
@@ -70,11 +69,8 @@ export async function GoldRate() {
               message={shareMessage(rate)}
               pageUrl={`${getSiteUrl(BRAND)}/gold-rate`}
             />
-            <Link href="/gold-rate" className="font-sans text-sm text-muted underline-offset-4 hover:text-gold hover:underline">
-              Rate history →
-            </Link>
           </div>
-          <p className="mt-2 font-sans text-xs text-muted">Rates are per gram, exclusive of making charges and GST.</p>
+          <p className="font-sans text-xs text-muted">Rates are per gram, exclusive of making charges and GST.</p>
         </Reveal>
       </div>
     </section>

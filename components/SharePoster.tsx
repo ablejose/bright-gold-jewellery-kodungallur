@@ -20,7 +20,6 @@ interface SharePosterProps {
  *  1. Share image  → phone share sheet → WhatsApp status / chat (Android & iOS)
  *  2. Download     → save the PNG to post manually
  *  3. WhatsApp text → wa.me with the rate and the link (link preview shows the poster)
- *  4. Copy link
  *
  * The image is fetched ahead of the click: Safari only opens the share sheet
  * if navigator.share runs straight from the tap, not after a network wait.
@@ -73,23 +72,15 @@ export function SharePoster({ posterUrl, fileName, message, pageUrl, compact = f
     }
   };
 
-  const copyLink = async () => {
-    try {
-      await navigator.clipboard.writeText(pageUrl);
-      flash("Link copied");
-    } catch {
-      flash(pageUrl);
-    }
-  };
-
   const whatsappText = `https://wa.me/?text=${encodeURIComponent(`${message}\n${pageUrl}`)}`;
-  const size = compact ? "!px-5 text-[13px]" : "";
+  // Compact: slimmer pills with room between them, for the homepage strip.
+  const size = compact ? "!min-h-[40px] !px-6 !py-2 text-[13px] md:!min-h-[42px]" : "";
 
   return (
     <div className="flex flex-col gap-3">
-      <div className="flex flex-wrap gap-3">
+      <div className={`flex flex-wrap ${compact ? "gap-3 sm:gap-4" : "gap-3"}`}>
         <button type="button" onClick={shareImage} className={`btn-primary ${size}`}>
-          {canShareFiles ? "Share poster" : "Download poster"}
+          {canShareFiles ? "Share poster" : "Download"}
         </button>
         <a href={whatsappText} target="_blank" rel="noopener noreferrer" className={`btn-secondary ${size}`}>
           Send on WhatsApp
@@ -99,9 +90,6 @@ export function SharePoster({ posterUrl, fileName, message, pageUrl, compact = f
             Download
           </button>
         ) : null}
-        <button type="button" onClick={copyLink} className={`btn-secondary ${size}`}>
-          Copy link
-        </button>
       </div>
       <p className="min-h-[1.25rem] font-sans text-caption text-gold" aria-live="polite">
         {status}

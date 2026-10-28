@@ -235,7 +235,6 @@ export function RateDesk({ initialRates, today, storageReady, siteUrl }: RateDes
     router.refresh();
   };
 
-  const hasExtras = Boolean(form.gold18 || form.gold24 || form.silver || form.note);
 
   return (
     <div className="min-h-screen pb-24">
@@ -378,7 +377,8 @@ export function RateDesk({ initialRates, today, storageReady, siteUrl }: RateDes
               </span>
             </label>
 
-            <details className="group mt-4" open={hasExtras}>
+            {/* Closed by default; the saved 18K / 24K / silver values still apply. */}
+            <details className="group mt-4">
               <summary className="cursor-pointer list-none font-sans text-sm text-muted hover:text-ivory">
                 <span className="group-open:hidden">+ 18K, 24K, silver, offer line, other date (optional)</span>
                 <span className="hidden group-open:inline">− Optional extras</span>

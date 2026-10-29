@@ -22,7 +22,9 @@ const config: Config = {
       },
       fontFamily: {
         // Wired to next/font CSS variables in app/layout.tsx
-        display: ["var(--font-cormorant)", "var(--font-malayalam)", "Cormorant Garamond", "serif"],
+        // "BG Digits" (app/globals.css) is Inter for 0-9 and the rupee sign only, so
+        // numbers in headings stay clear and level instead of Cormorant's old-style figures.
+        display: ['"BG Digits"', "var(--font-cormorant)", "var(--font-malayalam)", "Cormorant Garamond", "serif"],
         sans: ["var(--font-inter)", "var(--font-malayalam)", "Inter", "system-ui", "sans-serif"],
         malayalam: ["var(--font-malayalam)", "Noto Sans Malayalam", "sans-serif"],
         brand: ["var(--font-brand)", "Baloo Chettan 2", "cursive"],

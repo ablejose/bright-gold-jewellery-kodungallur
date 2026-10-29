@@ -49,7 +49,9 @@ function pageFonts(): Fonts {
   const style = getComputedStyle(document.documentElement);
   const read = (name: string, fallback: string) => style.getPropertyValue(name).trim() || fallback;
   return {
-    display: read("--font-cormorant", "Georgia, serif"),
+    // "BG Digits" (app/globals.css) is Inter for 0-9 and ₹ only, so dates and
+    // amounts drawn in the serif face still use clear, level numerals.
+    display: `"BG Digits", ${read("--font-cormorant", "Georgia, serif")}`,
     sans: read("--font-inter", "system-ui, sans-serif"),
     malayalam: read("--font-brand", read("--font-malayalam", "sans-serif")),
   };
@@ -84,6 +86,10 @@ export function loadStatusFonts(): Promise<Fonts> {
     const fonts = pageFonts();
     fontsReady = Promise.all([
       loadLogo(),
+      // The digits-only faces load on demand, so ask for them with sample text.
+      document.fonts.load('400 32px "BG Digits"', "0123456789"),
+      document.fonts.load('600 32px "BG Digits"', "0123456789"),
+      document.fonts.load('600 32px "BG Digits"', "₹"),
       document.fonts.load(`700 100px ${fonts.display}`),
       document.fonts.load(`600 40px ${fonts.display}`),
       document.fonts.load(`700 96px ${fonts.sans}`),

@@ -60,6 +60,29 @@ function posterPhoto(url: string, width: number, height: number): string {
   return url.replace("/upload/", `/upload/f_jpg,q_80,c_fill,g_center,w_${width},h_${height}/`);
 }
 
+/**
+ * A line in the serif face with its numbers in Inter. Cormorant's own digits are
+ * old-style figures that rise and fall, so "29 October 2026" is drawn as serif
+ * words with clear, level numerals (slightly smaller to sit evenly beside them).
+ */
+function SerifLine({ text, size, weight, color }: { text: string; size: number; weight: 600 | 700; color: string }) {
+  return (
+    <div style={{ display: "flex", alignItems: "baseline", color }}>
+      {text.split(/(\d+)/).filter(Boolean).map((part, index) =>
+        /^\d+$/.test(part) ? (
+          <span key={index} style={{ whiteSpace: "pre", fontFamily: "Sans", fontWeight: 600, fontSize: size * 0.88 }}>
+            {part}
+          </span>
+        ) : (
+          <span key={index} style={{ whiteSpace: "pre", fontFamily: "Display", fontWeight: weight, fontSize: size }}>
+            {part}
+          </span>
+        ),
+      )}
+    </div>
+  );
+}
+
 /** Price in Inter's lining figures, the ₹ smaller on the same baseline. */
 function Price({ value, size, color }: { value: number; size: number; color: string }) {
   return (
@@ -191,8 +214,8 @@ function Poster({
         <div style={{ display: "flex", fontFamily: "Sans", fontWeight: 600, fontSize: story ? 30 : 26, letterSpacing: 10, color: GOLD, marginTop: story ? 40 : 24 }}>
           {"TODAY'S GOLD RATE"}
         </div>
-        <div style={{ display: "flex", fontFamily: "Display", fontWeight: 600, fontSize: story ? 52 : 42, color: IVORY, marginTop: story ? 16 : 14 }}>
-          {formatFullDate(date)}
+        <div style={{ display: "flex", marginTop: story ? 16 : 14 }}>
+          <SerifLine text={formatFullDate(date)} size={story ? 52 : 42} weight={600} color={IVORY} />
         </div>
 
         {/* 22K headline card */}

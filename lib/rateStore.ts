@@ -49,6 +49,9 @@ async function readAll(): Promise<Record<string, GoldRate>> {
     for (let i = 0; i < flat.length; i += 2) rates[flat[i]] = JSON.parse(flat[i + 1]) as GoldRate;
     return rates;
   }
+  // On Vercel there is no local store. A stray file in the deployment (such as a
+  // developer's test rates) must never be published as the shop's real rates.
+  if (process.env.VERCEL === "1") return {};
   try {
     return JSON.parse(await fs.readFile(LOCAL_FILE, "utf8")) as Record<string, GoldRate>;
   } catch {
@@ -103,6 +106,9 @@ export async function deleteRate(date: string): Promise<void> {
   if (redisConfig()) {
     await redis(["HDEL", HASH_KEY, date]);
     return;
+  }
+  if (process.env.VERCEL === "1") {
+    throw new Error("Storage is not set up. Connect an Upstash Redis database in Vercel.");
   }
   const all = await readAll();
   delete all[date];

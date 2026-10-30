@@ -40,7 +40,7 @@ export default async function AdminPage() {
 
   return (
     <RateDesk
-      initialRates={await listRates(60)}
+      initialRates={await listRates(60, true)}
       today={todayIST()}
       storageReady={storageReady()}
       siteUrl={getSiteUrl(BRAND)}

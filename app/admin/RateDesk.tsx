@@ -61,6 +61,27 @@ const toNumber = (value: string) => {
   return Number.isFinite(number) && number > 0 ? number : undefined;
 };
 
+// Without a database the desk still works: recent rates stay in this browser, which is
+// all the poster needs for its "since yesterday" line.
+const LOCAL_KEY = "bright-gold:rates";
+
+function readLocalRates(): GoldRate[] {
+  try {
+    const list = JSON.parse(window.localStorage.getItem(LOCAL_KEY) ?? "[]") as GoldRate[];
+    return Array.isArray(list) ? list.filter((rate) => rate?.date && rate.gold22 > 0) : [];
+  } catch {
+    return [];
+  }
+}
+
+function writeLocalRates(list: GoldRate[]) {
+  try {
+    window.localStorage.setItem(LOCAL_KEY, JSON.stringify(list.slice(0, 60)));
+  } catch {
+    // Private mode or full storage: the file is still made, only the history is lost.
+  }
+}
+
 const inputClass =
   "w-full rounded-md border border-border bg-background px-4 py-3 font-sans text-body text-ivory outline-none transition-colors focus:border-gold";
 
@@ -101,6 +122,17 @@ export function RateDesk({ initialRates, today, storageReady, siteUrl }: RateDes
   const audioRef = useRef<AudioContext | null>(null);
 
   useEffect(() => setCanRecord(canMakeStatusVideo()), []);
+
+  useEffect(() => {
+    if (storageReady) return;
+    const local = readLocalRates().sort((a, b) => b.date.localeCompare(a.date));
+    if (local.length === 0) return;
+    setRates(local);
+    setForm((current) => {
+      const existing = local.find((rate) => rate.date === current.date);
+      return existing ? toForm(current.date, existing) : { ...toForm(current.date, local[0]), note: "" };
+    });
+  }, [storageReady]);
 
   const saved = rates.find((rate) => rate.date === form.date);
   const previous = rates.find((rate) => rate.date < form.date);
@@ -160,7 +192,22 @@ export function RateDesk({ initialRates, today, storageReady, siteUrl }: RateDes
 
     setError("");
     let rate = saved;
-    if (dirty) {
+    if (dirty && !storageReady) {
+      const local: GoldRate = {
+        date: form.date,
+        adId: form.adId,
+        gold22: toNumber(form.gold22) ?? 0,
+        gold18: toNumber(form.gold18),
+        gold24: toNumber(form.gold24),
+        silver: toNumber(form.silver),
+        note: form.note.trim() || undefined,
+        updatedAt: new Date().toISOString(),
+      };
+      rate = local;
+      const next = [local, ...rates.filter((r) => r.date !== local.date)].sort((a, b) => b.date.localeCompare(a.date));
+      setRates(next);
+      writeLocalRates(next);
+    } else if (dirty) {
       setBusy("saving");
       const response = await fetch("/api/admin/rates", {
         method: "POST",
@@ -229,6 +276,13 @@ export function RateDesk({ initialRates, today, storageReady, siteUrl }: RateDes
 
   const remove = async (date: string) => {
     if (!window.confirm(`Delete the rate for ${formatLongDate(date)}?`)) return;
+    if (!storageReady) {
+      const next = rates.filter((rate) => rate.date !== date);
+      setRates(next);
+      writeLocalRates(next);
+      if (form.date === date) setForm(toForm(date, undefined, form.adId));
+      return;
+    }
     const response = await fetch(`/api/admin/rates?date=${date}`, { method: "DELETE" });
     if (response.status === 401) return router.refresh();
     if (response.ok) {
@@ -266,8 +320,8 @@ export function RateDesk({ initialRates, today, storageReady, siteUrl }: RateDes
         <div className="flex flex-col gap-6">
           {!storageReady ? (
             <p className="rounded-md border border-[#F28B8B]/50 bg-[#F28B8B]/10 p-4 font-sans text-sm text-ivory">
-              Saving is not set up on this deployment yet. Connect an Upstash Redis database to the Vercel project
-              (Storage → Marketplace), then redeploy.
+              Videos and images download as usual. Recent rates are kept on this device only, and the
+              website&apos;s rate strip stays hidden until a database is connected.
             </p>
           ) : null}
 
@@ -506,7 +560,7 @@ export function RateDesk({ initialRates, today, storageReady, siteUrl }: RateDes
             <p className="text-center font-sans text-xs text-muted">This browser cannot make videos; the poster image below still works.</p>
           ) : null}
 
-          {saved && !dirty ? (
+          {saved && !dirty && storageReady ? (
             <details className="rounded-md border border-border p-4">
               <summary className="cursor-pointer font-sans text-sm text-muted hover:text-ivory">Other ways to share</summary>
               <div className="mt-4">

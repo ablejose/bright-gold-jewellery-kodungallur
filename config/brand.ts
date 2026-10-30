@@ -101,4 +101,92 @@ export const BRAND: BrandConfig = {
 
   whatsappMessage:
     "Hello Bright Gold Jewellery, I'd like to know more about your jewellery collections.",
+
+  ratePoster: {
+    image:
+      "https://res.cloudinary.com/nplfkyjy/image/upload/v1786453228/bright-gold/store1.webp",
+    strapline: "Kodungallur's Trusted Craftsmanship",
+    website: "brightgoldkodungallur.com",
+    addressLines: [
+      "Sreekumarasamajam Building, West Nada, Kodungallur",
+      "Near Kalpaka Weddings, North Nada, Kodungallur",
+    ],
+    // Status-video gallery: clips in public/rate-videos/<id>.mp4 (+ <id>.jpg),
+    // already cut to the 720x620 window. The clips are silent: every video gets
+    // the same light background music (public/rate-music) when it is recorded.
+    // The first eight are the shop's own footage/photos; the rest are stock clips
+    // (see CREDITS.txt there).
+    // Rules from the shop: whole pieces at a natural distance, never an
+    // extreme close-up of gold, and no faces (Silk Saree Bride Outdoors is
+    // the one exception they chose to keep).
+    ads: [
+      { id: "bangle", title: "Gold Bangle", length: 7, source: "Bright Gold brand film" },
+      { id: "earrings", title: "Ruby Earrings", length: 7, source: "Bright Gold brand film" },
+      { id: "showroom", title: "Our Showroom", length: 8, source: "Bright Gold store video" },
+      { id: "emerald-bridal-set", title: "Emerald Bridal Set", length: 7, source: "Bright Gold photo, slow zoom" },
+      { id: "lakshmi-haram", title: "Lakshmi Haram", length: 7, source: "Bright Gold photo, slow zoom" },
+      { id: "kerala-haram-set", title: "Kerala Gold Haram Set", length: 7, source: "Bright Gold photo, slow zoom" },
+      { id: "gold-bridal-belt-set", title: "Gold Bridal Set & Belt", length: 7, source: "Bright Gold photo, slow zoom" },
+      { id: "light-flower-necklace", title: "Light Flower Necklace", length: 7, source: "Bright Gold photo, slow zoom" },
+      { id: "pendant-petals", title: "Pendant on Rose Petals", length: 7, source: "Pexels 37771539" },
+      { id: "layered-chains", title: "Layered Gold Chains", length: 5, source: "Pexels 6469640" },
+      { id: "gold-diamond-rings", title: "Gold & Diamond Rings", length: 7, source: "Pexels 34369899" },
+      { id: "rose-gold-ring", title: "Rose Gold Ring", length: 9, source: "Pexels 31757666" },
+      { id: "bridal-set-roses", title: "Bridal Set with Roses", length: 7, source: "Pexels 11353208" },
+      { id: "gold-showcase", title: "Gold Showcase", length: 6.5, source: "Pexels 36338911" },
+      { id: "bangle-showcase", title: "Bangle Showcase", length: 6.5, source: "Pexels 36353836" },
+      { id: "necklace-table", title: "Necklaces on Display", length: 7, source: "Pexels 6874763" },
+      { id: "kundan-bridal", title: "Kundan Bridal", length: 7, source: "Pexels 11122318" },
+      { id: "jewellery-box", title: "Jewellery Box", length: 7, source: "Pexels 8087659" },
+      { id: "lotus-pendant", title: "Lotus Pendant", length: 7, source: "Pexels 34465658" },
+      { id: "polki-bracelet", title: "Polki Bracelet", length: 6, source: "Mixkit 34611" },
+      { id: "necklace-collection", title: "Necklace Collection", length: 7, source: "Pexels 8855209" },
+      { id: "jhumka-display", title: "Jhumka Display", length: 7, source: "Pexels 8844354" },
+      { id: "chandbali", title: "Chandbali Earrings", length: 7, source: "Pexels 8844346" },
+      { id: "bangle-rack", title: "Gold Bangles", length: 7, source: "Pexels 8844368" },
+      { id: "necklace-set", title: "Necklace Set", length: 7, source: "Pexels 5704899" },
+      { id: "handcrafted", title: "Handcrafted", length: 7, source: "Pexels 6262804" },
+      { id: "mehndi-rings", title: "Mehndi & Rings", length: 7, source: "Pexels 9797021" },
+      { id: "bangles-rings", title: "Bangles & Rings", length: 7, source: "Pexels 11122341" },
+      { id: "gold-bracelet", title: "Gold Bracelet", length: 7, source: "Pexels 36546100" },
+      { id: "gold-beads", title: "Gold Beads", length: 7, source: "Pexels 8844339" },
+    ],
+    // The best 30 of the shop's photos (Oct 2026), cropped in public/rate-photos
+    // so logos, clips and phone bars are out of frame. Best first.
+    photos: [
+      "Bridal Collection",
+      "Bridal Set",
+      "Bridal Box",
+      "Temple Necklace Set",
+      "Layered Necklaces",
+      "Kerala Bridal Set",
+      "Bridal Necklace",
+      "Our Showroom",
+      "Gold Bangles",
+      "Antique Ruby Necklace",
+      "Lakshmi Pendant",
+      "Ruby Long Chain",
+      "Layered Necklace",
+      "Floral Necklace",
+      "Palakka Necklace",
+      "Kerala Necklace",
+      "Leaf Necklace",
+      "Grand Haram",
+      "Ruby Layered Set",
+      "Pendant Necklace",
+      "Crescent Necklace",
+      "Stone Necklace",
+      "Bangle Stack",
+      "Carved Bangles",
+      "Kasu Mala",
+      "Classic Necklace",
+      "Bridal Haram",
+      "Flower Pendant Chain",
+      "Delicate Chains",
+      "Necklace Set",
+    ].map((title, index) => {
+      const n = String(index + 1).padStart(2, "0");
+      return { id: `photo-${n}`, title, src: `/rate-photos/photo-${n}.jpg` };
+    }),
+  },
 };

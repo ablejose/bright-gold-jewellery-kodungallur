@@ -1,4 +1,5 @@
 import { BRAND } from "@/config/brand";
+import { BrandMark } from "@/components/BrandMark";
 import { telHref, whatsappHref } from "@/lib/format";
 
 const QUICK_LINKS = [
@@ -18,8 +19,11 @@ export function Footer() {
     <footer className="border-t border-border py-16">
       <div className="container-lux grid grid-cols-1 gap-12 md:grid-cols-3">
         <div>
-          <p className="font-display text-xl text-ivory">{BRAND.businessName}</p>
-          <p className="mt-3 max-w-xs font-sans text-body text-muted">{BRAND.tagline}</p>
+          <div className="flex items-center gap-4">
+            <BrandMark className="h-12" />
+            <p className="font-display text-xl text-ivory">{BRAND.businessName}</p>
+          </div>
+          <p className="mt-4 max-w-xs font-sans text-body text-muted">{BRAND.tagline}</p>
         </div>
 
         <nav aria-label="Footer">

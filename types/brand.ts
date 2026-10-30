@@ -86,4 +86,48 @@ export interface BrandConfig {
   faq: FaqItem[];
 
   whatsappMessage: string;
+
+  /** Daily gold-rate poster (shared as a WhatsApp status / message image). */
+  ratePoster: RatePosterConfig;
+}
+
+export interface RatePosterConfig {
+  /** Tall product photo for the top of the 9:16 poster (any Cloudinary image). */
+  image: string;
+  /** Short line under the brand name on the poster. */
+  strapline: string;
+  /** Website shown in the poster footer, without https://. */
+  website: string;
+  /** Address lines printed on the poster, one per line, top to bottom. */
+  addressLines: string[];
+  /** Gallery of short ad clips the admin picks from for the daily status video. */
+  ads: RateAd[];
+  /** Gallery of photos for a still status image (same rate panel, no motion). */
+  photos: RatePhoto[];
+}
+
+/**
+ * One gallery photo, pre-cropped to the poster's photo window (720x620): the
+ * jewellery sits in the clear middle, between the shop name and the rate panel.
+ */
+export interface RatePhoto {
+  /** Stable id stored with the day's rate. Never reuse an id for a different photo. */
+  id: string;
+  title: string;
+  /** Same-origin path under /public, so the canvas can export it. */
+  src: string;
+}
+
+/**
+ * One gallery clip, stored in the repo at public/rate-videos/<id>.mp4 with a
+ * still at <id>.jpg, already trimmed and cropped to the 720x620 window.
+ */
+export interface RateAd {
+  /** Stable id (and file name) stored with the day's rate. Never reuse an id for a different clip. */
+  id: string;
+  title: string;
+  /** Seconds; the status video is this long. */
+  length: number;
+  /** Where the footage came from (licence record). */
+  source: string;
 }

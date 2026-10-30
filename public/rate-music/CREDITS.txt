@@ -1,0 +1,8 @@
+Default background music for the status videos (public/rate-music/default.mp3).
+
+Robert Schumann, "Träumerei" (Scenes from Childhood, Op. 15, No. 7).
+Public-domain composition; recording from Musopen (https://musopen.org),
+dedicated to the public domain, via Wikimedia Commons:
+https://commons.wikimedia.org/wiki/File:Robert_Schumann_-_scenes_from_childhood,_op._15_-_vii._dreaming.ogg
+Excerpt: first 14 s, loudness-normalised, converted to MP3. Free to use and
+redistribute; no attribution required.

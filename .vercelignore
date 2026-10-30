@@ -1,0 +1,13 @@
+# Files that must never be uploaded when deploying from a laptop with `vercel deploy`.
+# (The CLI does not apply .gitignore to these.)
+
+# Local test rates from development: would otherwise be published as real rates.
+.data
+
+# Local build output and caches
+.next
+*.tsbuildinfo
+
+# Local environment files and Vercel's link folder
+.env*.local
+.vercel

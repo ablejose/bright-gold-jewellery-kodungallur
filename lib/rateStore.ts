@@ -5,9 +5,14 @@ import type { GoldRate } from "@/types/goldRate";
 /**
  * Where the daily rates live.
  *
- * Production: an Upstash Redis database (add it from the Vercel Marketplace;
- * Vercel sets KV_REST_API_URL / KV_REST_API_TOKEN). All rates are one Redis
- * hash keyed by date, so a year is ~365 small fields.
+ * Production, either of:
+ *  - Vercel Edge Config (free on Hobby, no redeploy when it changes): one item,
+ *    "rates", holding the newest days. It is capped at 8 KB, so saving drops the
+ *    oldest days instead of failing. EDGE_CONFIG (read connection string) is set
+ *    when the store is connected to the project; saving also needs
+ *    EDGE_CONFIG_WRITE_TOKEN (a Vercel API token) and EDGE_CONFIG_TEAM_ID.
+ *  - An Upstash Redis database (Vercel Marketplace sets KV_REST_API_URL /
+ *    KV_REST_API_TOKEN). All rates are one Redis hash keyed by date.
  *
  * Local development without Redis: a JSON file in .data/ (git-ignored).
  * Vercel's filesystem is read-only, so the file store never runs there.
@@ -22,9 +27,85 @@ function redisConfig(): { url: string; token: string } | null {
   return url && token ? { url, token } : null;
 }
 
+const EDGE_ITEM = "rates";
+// Edge Config allows 8 KB per store; stay well under it and keep a useful window.
+const EDGE_MAX_BYTES = 6000;
+const EDGE_MAX_DAYS = 45;
+
+function edgeRead(): { id: string; token: string } | null {
+  const raw = process.env.EDGE_CONFIG;
+  if (!raw) return null;
+  try {
+    const url = new URL(raw);
+    const id = url.pathname.replace(/^\//, "");
+    const token = url.searchParams.get("token");
+    return id && token ? { id, token } : null;
+  } catch {
+    return null;
+  }
+}
+
+function edgeWrite(): { id: string; token: string; teamId?: string } | null {
+  const read = edgeRead();
+  const token = process.env.EDGE_CONFIG_WRITE_TOKEN;
+  return read && token ? { id: read.id, token, teamId: process.env.EDGE_CONFIG_TEAM_ID } : null;
+}
+
 /** True when saving will work in this environment. */
 export function storageReady(): boolean {
-  return redisConfig() !== null || process.env.VERCEL !== "1";
+  return redisConfig() !== null || edgeWrite() !== null || process.env.VERCEL !== "1";
+}
+
+/** The newest days that fit in an Edge Config item. */
+function trimForEdge(all: Record<string, GoldRate>): Record<string, GoldRate> {
+  const dates = Object.keys(all).sort().reverse().slice(0, EDGE_MAX_DAYS);
+  const kept: Record<string, GoldRate> = {};
+  for (const date of dates) {
+    kept[date] = all[date];
+    if (JSON.stringify(kept).length > EDGE_MAX_BYTES) {
+      delete kept[date];
+      break;
+    }
+  }
+  return kept;
+}
+
+async function edgeReadAll(fresh: boolean): Promise<Record<string, GoldRate>> {
+  const write = edgeWrite();
+  if (fresh && write) {
+    // The management API sees a save at once; the public read endpoint can lag a few seconds.
+    const query = write.teamId ? `?teamId=${write.teamId}` : "";
+    const response = await fetch(`https://api.vercel.com/v1/edge-config/${write.id}/item/${EDGE_ITEM}${query}`, {
+      headers: { Authorization: `Bearer ${write.token}` },
+      cache: "no-store",
+    });
+    if (response.status === 404) return {};
+    if (!response.ok) throw new Error(`Edge Config ${response.status}`);
+    // The management API wraps the stored value ({ key, value, ... }) and sends no body when nothing is saved yet.
+    const text = await response.text();
+    return text ? ((JSON.parse(text) as { value?: Record<string, GoldRate> | null }).value ?? {}) : {};
+  }
+  const read = edgeRead();
+  if (!read) return {};
+  const response = await fetch(`https://edge-config.vercel.com/${read.id}/item/${EDGE_ITEM}?token=${read.token}`, {
+    next: { revalidate: 60 },
+  });
+  if (!response.ok) return {};
+  const text = await response.text();
+  return text ? ((JSON.parse(text) as Record<string, GoldRate> | null) ?? {}) : {};
+}
+
+async function edgeWriteAll(all: Record<string, GoldRate>): Promise<void> {
+  const write = edgeWrite();
+  if (!write) throw new Error("Edge Config is not set up for saving.");
+  const query = write.teamId ? `?teamId=${write.teamId}` : "";
+  const response = await fetch(`https://api.vercel.com/v1/edge-config/${write.id}/items${query}`, {
+    method: "PATCH",
+    headers: { Authorization: `Bearer ${write.token}`, "Content-Type": "application/json" },
+    body: JSON.stringify({ items: [{ operation: "upsert", key: EDGE_ITEM, value: trimForEdge(all) }] }),
+    cache: "no-store",
+  });
+  if (!response.ok) throw new Error(`Edge Config save failed (${response.status})`);
 }
 
 async function redis<T>(command: (string | number)[]): Promise<T> {
@@ -41,7 +122,8 @@ async function redis<T>(command: (string | number)[]): Promise<T> {
   return body.result as T;
 }
 
-async function readAll(): Promise<Record<string, GoldRate>> {
+async function readAll(fresh = false): Promise<Record<string, GoldRate>> {
+  if (!redisConfig() && edgeRead()) return edgeReadAll(fresh);
   if (redisConfig()) {
     // HGETALL returns a flat [field, value, field, value, ...] list.
     const flat = await redis<string[]>(["HGETALL", HASH_KEY]);
@@ -60,8 +142,8 @@ async function readAll(): Promise<Record<string, GoldRate>> {
 }
 
 /** All saved rates, newest day first. */
-export async function listRates(limit = 60): Promise<GoldRate[]> {
-  const all = await readAll();
+export async function listRates(limit = 60, fresh = false): Promise<GoldRate[]> {
+  const all = await readAll(fresh);
   return Object.values(all)
     .sort((a, b) => b.date.localeCompare(a.date))
     .slice(0, limit);
@@ -93,8 +175,14 @@ export async function saveRate(rate: GoldRate): Promise<void> {
     await redis(["HSET", HASH_KEY, rate.date, JSON.stringify(rate)]);
     return;
   }
+  if (edgeWrite()) {
+    const all = await edgeReadAll(true);
+    all[rate.date] = rate;
+    await edgeWriteAll(all);
+    return;
+  }
   if (process.env.VERCEL === "1") {
-    throw new Error("Storage is not set up. Connect an Upstash Redis database in Vercel.");
+    throw new Error("Storage is not set up. Connect Vercel Edge Config or an Upstash Redis database.");
   }
   const all = await readAll();
   all[rate.date] = rate;
@@ -107,8 +195,14 @@ export async function deleteRate(date: string): Promise<void> {
     await redis(["HDEL", HASH_KEY, date]);
     return;
   }
+  if (edgeWrite()) {
+    const all = await edgeReadAll(true);
+    delete all[date];
+    await edgeWriteAll(all);
+    return;
+  }
   if (process.env.VERCEL === "1") {
-    throw new Error("Storage is not set up. Connect an Upstash Redis database in Vercel.");
+    throw new Error("Storage is not set up. Connect Vercel Edge Config or an Upstash Redis database.");
   }
   const all = await readAll();
   delete all[date];

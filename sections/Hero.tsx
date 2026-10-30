@@ -6,7 +6,8 @@ import { telHref } from "@/lib/format";
 /**
  * Full-viewport hero with an autoplay, muted, looping Cloudinary film behind
  * the brand name, tagline and a single CTA (Document 2 §4, Document 5 §7).
- * The brand is shown as the logo alone. Content anchored slightly left of center.
+ * The title is the single brand word "Bright Gold". Content anchored slightly
+ * left of center.
  */
 export function Hero() {
   return (
@@ -26,13 +27,15 @@ export function Hero() {
 
       <div className="container-lux relative z-10">
         <div className="max-w-2xl">
-          {/* The logo alone stands in for the brand name; the h1 stays for screen
-              readers and search engines. */}
-          <h1 className="sr-only">Bright Gold Jewellery</h1>
-          <span className="logo-glow" aria-hidden="true">
-            <BrandMark priority className="!h-[clamp(5.5rem,15vw,10rem)]" />
-          </span>
-          <p className="mt-4 font-sans text-sm tracking-wide text-gold-glow">{BRAND.tagline}</p>
+          {/* Emblem and name on one line; the emblem's height tracks the title's
+              fluid font size (clamp(3rem, 8vw, 5.5rem)) so they always line up. */}
+          <div className="flex items-center gap-4 md:gap-6">
+            <span className="logo-glow shrink-0" aria-hidden="true">
+              <BrandMark priority className="!h-[clamp(2.7rem,7.2vw,5rem)]" />
+            </span>
+            <h1 className="font-display text-display-xl text-gold-sweep">Bright Gold</h1>
+          </div>
+          <p className="mt-2 font-sans text-sm tracking-wide text-gold-glow">{BRAND.tagline}</p>
           <p className="mt-4 max-w-xl font-sans text-body-lg text-gold">
             3 Decades of purity, elegance, and unmatched trust in Kodungallur. Celebrate your golden moments with Bright Gold Jewellery.
           </p>

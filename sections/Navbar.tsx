@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { BrandMark } from "@/components/BrandMark";
 import { useScrolled } from "@/hooks/useScrolled";
 
 const LINKS = [
@@ -13,7 +14,7 @@ const LINKS = [
 /**
  * Sticky navigation. Scrolled state becomes more opaque with backdrop blur and
  * reduced padding (Document 2 §3). Mobile uses a full-screen overlay menu.
- * The logo shows the brand as a single gold title, "Bright Gold".
+ * The brand at the top left is the logo emblem.
  */
 export function Navbar() {
   const scrolled = useScrolled();
@@ -47,10 +48,8 @@ export function Navbar() {
       }`}
     >
       <nav className="container-lux flex items-center justify-between" aria-label="Primary">
-        <Link href="#top" className="flex flex-col leading-none" aria-label="Bright Gold home">
-          <span className="font-display text-xl tracking-wide text-gold">
-            Bright Gold
-          </span>
+        <Link href="#top" className="flex items-center leading-none" aria-label="Bright Gold home">
+          <BrandMark priority className="!h-9 md:!h-11" />
         </Link>
 
         <ul className="hidden items-center gap-10 md:flex">

@@ -21,6 +21,31 @@ function ChangeMark({ diff }: { diff: number }) {
   );
 }
 
+/** One price with its change beside it; wraps under the price rather than touching the card edge. */
+function Price({
+  label,
+  amount,
+  diff,
+  tone,
+  divided,
+}: {
+  label: string;
+  amount: number;
+  diff: number | null;
+  tone: string;
+  divided?: boolean;
+}) {
+  return (
+    <div className={`min-w-0 ${divided ? "border-t border-border pt-4 sm:border-t-0 sm:pt-0" : ""}`}>
+      <p className="text-caption uppercase tracking-[0.18em] text-muted">{label}</p>
+      <p className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1">
+        <span className={`text-3xl font-semibold leading-none ${tone}`}>₹{formatAmount(amount)}</span>
+        {diff !== null ? <ChangeMark diff={diff} /> : null}
+      </p>
+    </div>
+  );
+}
+
 /**
  * Today's gold rate as one small card, right under the hero. Rates come from the
  * admin desk; the section hides itself until the first rate is saved. Standard
@@ -51,19 +76,14 @@ export async function GoldRate() {
 
             {/* One price per row on phones so the figures never touch; two columns from sm up. */}
             <div className="mt-5 grid gap-4 sm:grid-cols-2 sm:gap-6">
-              <div>
-                <p className="text-caption uppercase tracking-[0.18em] text-muted">22K · 916 per gram</p>
-                <p className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1">
-                  <span className="text-3xl font-semibold leading-none text-gold">₹{formatAmount(rate.gold22)}</span>
-                  {diff !== null ? <ChangeMark diff={diff} /> : null}
-                </p>
-              </div>
-              <div className="border-t border-border pt-4 sm:border-t-0 sm:pt-0">
-                <p className="text-caption uppercase tracking-[0.18em] text-muted">1 Pavan · 8g</p>
-                <p className="mt-1.5 text-3xl font-semibold leading-none text-ivory">
-                  ₹{formatAmount(rate.gold22 * GRAMS_PER_PAVAN)}
-                </p>
-              </div>
+              <Price label="22K · 916 per gram" amount={rate.gold22} diff={diff} tone="text-gold" />
+              <Price
+                label="1 Pavan · 8g"
+                amount={rate.gold22 * GRAMS_PER_PAVAN}
+                diff={diff === null ? null : diff * GRAMS_PER_PAVAN}
+                tone="text-ivory"
+                divided
+              />
             </div>
 
             {extras.length > 0 ? (

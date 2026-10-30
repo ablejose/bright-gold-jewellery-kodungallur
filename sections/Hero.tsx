@@ -27,11 +27,11 @@ export function Hero() {
 
       <div className="container-lux relative z-10">
         <div className="max-w-2xl">
-          {/* Emblem and name on one line; the emblem's height tracks the title's
-              fluid font size (clamp(3rem, 8vw, 5.5rem)) so they always line up. */}
+          {/* Emblem and name on one line; the emblem is a little shorter than the
+              title and scales with its fluid font size (clamp(3rem, 8vw, 5.5rem)). */}
           <div className="flex items-center gap-4 md:gap-6">
             <span className="logo-glow shrink-0" aria-hidden="true">
-              <BrandMark priority className="!h-[clamp(2.7rem,7.2vw,5rem)]" />
+              <BrandMark priority className="!h-[clamp(2.2rem,6vw,4.1rem)]" />
             </span>
             <h1 className="font-display text-display-xl text-gold-sweep">Bright Gold</h1>
           </div>

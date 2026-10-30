@@ -43,21 +43,22 @@ export async function GoldRate() {
     <section id="gold-rate" className="py-10 md:py-12">
       <div className="container-lux">
         <Reveal>
-          <div className="mx-auto max-w-xl rounded-card border border-gold/40 bg-gold/[0.05] p-6 font-sans tabular-nums md:p-7">
-            <div className="flex items-baseline justify-between gap-4">
+          <div className="mx-auto max-w-xl rounded-card border border-gold/40 bg-gold/[0.05] p-5 font-sans tabular-nums sm:p-6 md:p-7">
+            <div className="flex flex-col gap-1 sm:flex-row sm:items-baseline sm:justify-between sm:gap-4">
               <span className="label-eyebrow">{rate.date === today ? "Today's Gold Rate" : "Latest Gold Rate"}</span>
               <span className="text-sm text-muted">{formatLongDate(rate.date)}</span>
             </div>
 
-            <div className="mt-5 grid grid-cols-2 gap-4">
+            {/* One price per row on phones so the figures never touch; two columns from sm up. */}
+            <div className="mt-5 grid gap-4 sm:grid-cols-2 sm:gap-6">
               <div>
                 <p className="text-caption uppercase tracking-[0.18em] text-muted">22K · 916 per gram</p>
-                <p className="mt-1.5 flex items-center gap-2.5">
+                <p className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1">
                   <span className="text-3xl font-semibold leading-none text-gold">₹{formatAmount(rate.gold22)}</span>
                   {diff !== null ? <ChangeMark diff={diff} /> : null}
                 </p>
               </div>
-              <div>
+              <div className="border-t border-border pt-4 sm:border-t-0 sm:pt-0">
                 <p className="text-caption uppercase tracking-[0.18em] text-muted">1 Pavan · 8g</p>
                 <p className="mt-1.5 text-3xl font-semibold leading-none text-ivory">
                   ₹{formatAmount(rate.gold22 * GRAMS_PER_PAVAN)}
@@ -66,18 +67,19 @@ export async function GoldRate() {
             </div>
 
             {extras.length > 0 ? (
-              <p className="mt-4 flex flex-wrap gap-x-5 gap-y-1 border-t border-border pt-4 text-sm text-muted">
+              <dl className="mt-4 grid grid-cols-3 gap-x-3 border-t border-border pt-4 sm:flex sm:gap-x-8">
                 {extras.map((item) => (
-                  <span key={item.label}>
-                    {item.label} <span className="text-ivory">₹{formatAmount(item.value)}</span>
-                  </span>
+                  <div key={item.label}>
+                    <dt className="text-caption uppercase tracking-[0.18em] text-muted">{item.label}</dt>
+                    <dd className="mt-0.5 text-base font-medium text-ivory">₹{formatAmount(item.value)}</dd>
+                  </div>
                 ))}
-              </p>
+              </dl>
             ) : null}
 
-            <div className="mt-4 flex flex-wrap items-center justify-between gap-2 text-xs text-muted">
+            <div className="mt-4 flex flex-col gap-1 text-xs text-muted sm:flex-row sm:items-center sm:justify-between sm:gap-2">
               <span>Per gram, exclusive of making charges and GST.</span>
-              <Link href="/gold-rate" className="text-gold transition-colors hover:text-ivory">
+              <Link href="/gold-rate" className="-my-1 inline-block py-2 text-sm text-gold transition-colors hover:text-ivory">
                 Share today&apos;s rate
               </Link>
             </div>

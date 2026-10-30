@@ -82,17 +82,23 @@ function writeLocalRates(list: GoldRate[]) {
   }
 }
 
+const changeTint = (diff: number | null) =>
+  diff && diff > 0 ? "text-[#7FD69B]" : diff && diff < 0 ? "text-[#F28B8B]" : "text-muted";
+
+const changeText = (diff: number | null) =>
+  diff === null ? "—" : diff === 0 ? "0" : `${diff > 0 ? "▲" : "▼"} ₹${formatAmount(Math.abs(diff))}`;
+
 const inputClass =
   "w-full rounded-md border border-border bg-background px-4 py-3 font-sans text-body text-ivory outline-none transition-colors focus:border-gold";
 
 function Step({ number, title, children }: { number: number; title: string; children: React.ReactNode }) {
   return (
-    <section className="rounded-card border border-gold/25 bg-white/[0.03] p-5 md:p-7">
+    <section className="rounded-card border border-gold/25 bg-white/[0.03] p-4 sm:p-5 md:p-7">
       <div className="flex items-center gap-3">
         <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-pill bg-gold font-sans text-sm font-semibold text-background">
           {number}
         </span>
-        <h2 className="font-display text-2xl text-ivory md:text-[1.75rem]">{title}</h2>
+        <h2 className="font-display text-xl leading-tight text-ivory sm:text-2xl md:text-[1.75rem]">{title}</h2>
       </div>
       <div className="mt-5">{children}</div>
     </section>
@@ -327,12 +333,16 @@ export function RateDesk({ initialRates, today, storageReady, siteUrl }: RateDes
           <div>
             <p className="label-eyebrow">{form.date === today ? "Today" : "Editing"}</p>
             <h1 className="mt-1 font-display text-display-m text-ivory">
-              {formatLongDate(form.date)} <span className="text-muted">· {formatWeekday(form.date)}</span>
+              {formatLongDate(form.date)}
+              <span className="block text-muted sm:inline">
+                <span className="hidden sm:inline"> · </span>
+                {formatWeekday(form.date)}
+              </span>
             </h1>
           </div>
 
           <Step number={1} title={tab === "photo" ? "Choose today's image" : "Choose today's video"}>
-            <div role="tablist" className="mb-4 inline-flex rounded-pill border border-border p-1 font-sans text-sm">
+            <div role="tablist" className="mb-4 flex rounded-pill border border-border p-1 font-sans text-sm sm:inline-flex">
               {(
                 [
                   ["video", `Videos (${ADS.length})`],
@@ -345,7 +355,7 @@ export function RateDesk({ initialRates, today, storageReady, siteUrl }: RateDes
                   role="tab"
                   aria-selected={tab === key}
                   onClick={() => setTab(key)}
-                  className={`rounded-pill px-5 py-2 transition-colors ${tab === key ? "bg-gold text-background" : "text-muted hover:text-ivory"}`}
+                  className={`flex-1 whitespace-nowrap rounded-pill px-4 py-2.5 text-center transition-colors sm:flex-none sm:px-5 sm:py-2 ${tab === key ? "bg-gold text-background" : "text-muted hover:text-ivory"}`}
                 >
                   {label}
                 </button>
@@ -353,7 +363,7 @@ export function RateDesk({ initialRates, today, storageReady, siteUrl }: RateDes
             </div>
 
             {tab === "photo" ? (
-              <div className="grid max-h-[62vh] grid-cols-3 gap-2.5 overflow-y-auto pr-1 sm:grid-cols-4">
+              <div className="grid max-h-[62vh] grid-cols-2 gap-2.5 overflow-y-auto min-[420px]:grid-cols-3 sm:grid-cols-4">
                 {PHOTOS.map((item) => {
                   const selected = item.id === form.adId;
                   return (
@@ -381,7 +391,7 @@ export function RateDesk({ initialRates, today, storageReady, siteUrl }: RateDes
             ) : null}
 
             <div
-              className={`grid max-h-[62vh] grid-cols-3 gap-2.5 overflow-y-auto pr-1 sm:grid-cols-4 ${tab === "photo" ? "hidden" : ""}`}
+              className={`grid max-h-[62vh] grid-cols-2 gap-2.5 overflow-y-auto min-[420px]:grid-cols-3 sm:grid-cols-4 ${tab === "photo" ? "hidden" : ""}`}
             >
               {ADS.map((item) => {
                 const selected = item.id === form.adId;
@@ -443,7 +453,7 @@ export function RateDesk({ initialRates, today, storageReady, siteUrl }: RateDes
                 <span className="group-open:hidden">+ 18K, 24K, silver, offer line, other date (optional)</span>
                 <span className="hidden group-open:inline">− Optional extras</span>
               </summary>
-              <div className="mt-4 grid grid-cols-3 gap-3">
+              <div className="mt-4 grid grid-cols-2 gap-3 min-[460px]:grid-cols-3">
                 {EXTRA_FIELDS.map((field) => (
                   <label key={field.key} className="flex flex-col gap-1.5">
                     <span className="font-sans text-caption uppercase tracking-[0.15em] text-muted">{field.label} / g</span>
@@ -467,7 +477,7 @@ export function RateDesk({ initialRates, today, storageReady, siteUrl }: RateDes
                   className={inputClass}
                 />
               </label>
-              <label className="mt-3 flex max-w-[220px] flex-col gap-1.5">
+              <label className="mt-3 flex flex-col gap-1.5 sm:max-w-[220px]">
                 <span className="font-sans text-caption uppercase tracking-[0.15em] text-muted">Date</span>
                 <input type="date" value={form.date} max={today} onChange={(e) => e.target.value && pickDate(e.target.value)} className={inputClass} />
               </label>
@@ -481,7 +491,7 @@ export function RateDesk({ initialRates, today, storageReady, siteUrl }: RateDes
             <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-pill bg-gold font-sans text-sm font-semibold text-background">
               3
             </span>
-            <h2 className="font-display text-2xl text-ivory md:text-[1.75rem]">{ready ? "Share it" : "Preview & done"}</h2>
+            <h2 className="font-display text-xl leading-tight text-ivory sm:text-2xl md:text-[1.75rem]">{ready ? "Share it" : "Preview & done"}</h2>
           </div>
 
           <div className="mx-auto w-full max-w-[300px] overflow-hidden rounded-md border border-gold/30 bg-black">
@@ -580,7 +590,45 @@ export function RateDesk({ initialRates, today, storageReady, siteUrl }: RateDes
           {rates.length === 0 ? (
             <p className="mt-4 font-sans text-body text-muted">No rates saved yet.</p>
           ) : (
-            <div className="mt-4 overflow-x-auto">
+            <>
+            <ul className="mt-4 flex flex-col gap-2.5 font-sans md:hidden">
+              {rates.map((rate, index) => {
+                const before = rates[index + 1];
+                const diff = before ? rate.gold22 - before.gold22 : null;
+                return (
+                  <li
+                    key={rate.date}
+                    className={`rounded-md border p-4 ${rate.date === form.date ? "border-gold/50 bg-gold/[0.06]" : "border-border"}`}
+                  >
+                    <div className="flex items-baseline justify-between gap-3">
+                      <span className="text-sm text-ivory">{formatLongDate(rate.date)}</span>
+                      <span className={`text-sm font-medium ${changeTint(diff)}`}>{changeText(diff)}</span>
+                    </div>
+                    <div className="mt-1 flex items-center justify-between gap-3">
+                      <p className="text-2xl font-semibold text-gold">{formatRupees(rate.gold22)}</p>
+                      <div className="flex shrink-0 gap-2 text-sm">
+                        <button
+                          type="button"
+                          onClick={() => pickDate(rate.date)}
+                          className="rounded-md border border-border px-4 py-2 text-ivory hover:border-gold hover:text-gold"
+                        >
+                          Open
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => remove(rate.date)}
+                          className="rounded-md border border-border px-3 py-2 text-muted hover:border-[#F28B8B]/60 hover:text-[#F28B8B]"
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    </div>
+                    <p className="mt-1 truncate text-xs text-muted">{mediaTitle(rate.adId) ?? "No video / image"}</p>
+                  </li>
+                );
+              })}
+            </ul>
+            <div className="mt-4 hidden overflow-x-auto md:block">
               <table className="w-full min-w-[520px] border-collapse font-sans text-sm">
                 <thead>
                   <tr className="border-b border-border text-left text-caption uppercase tracking-[0.15em] text-muted">
@@ -599,9 +647,7 @@ export function RateDesk({ initialRates, today, storageReady, siteUrl }: RateDes
                       <tr key={rate.date} className={`border-b border-border/60 ${rate.date === form.date ? "bg-gold/[0.06]" : ""}`}>
                         <td className="py-3 pr-4 text-ivory">{formatLongDate(rate.date)}</td>
                         <td className="py-3 pr-4 text-gold">{formatRupees(rate.gold22)}</td>
-                        <td className={`py-3 pr-4 ${diff && diff > 0 ? "text-[#7FD69B]" : diff && diff < 0 ? "text-[#F28B8B]" : "text-muted"}`}>
-                          {diff === null ? "—" : diff === 0 ? "0" : `${diff > 0 ? "▲" : "▼"} ${formatAmount(Math.abs(diff))}`}
-                        </td>
+                        <td className={`py-3 pr-4 ${changeTint(diff)}`}>{changeText(diff)}</td>
                         <td className="py-3 pr-4 text-muted">{mediaTitle(rate.adId) ?? "—"}</td>
                         <td className="py-3 text-right">
                           <button type="button" onClick={() => pickDate(rate.date)} className="mr-4 text-muted hover:text-gold">
@@ -617,6 +663,7 @@ export function RateDesk({ initialRates, today, storageReady, siteUrl }: RateDes
                 </tbody>
               </table>
             </div>
+            </>
           )}
         </section>
       </main>

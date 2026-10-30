@@ -1,7 +1,7 @@
 import { ImageResponse } from "next/og";
 import { BRAND } from "@/config/brand";
 import { displayPhone } from "@/lib/format";
-import { formatAmount, formatFullDate, isIsoDate, sinceLabel, todayIST } from "@/lib/goldRate";
+import { formatAmount, formatFullDate, isIsoDate, todayIST } from "@/lib/goldRate";
 import { GRAMS_PER_PAVAN, type GoldRate } from "@/types/goldRate";
 
 /**
@@ -96,13 +96,25 @@ function Price({ value, size, color }: { value: number; size: number; color: str
 function Change({ rate, previous, size }: { rate: GoldRate | null; previous: GoldRate | null; size: number }) {
   if (!rate || !previous) return null;
   const diff = rate.gold22 - previous.gold22;
-  const since = sinceLabel(rate.date, previous.date);
   const tint = diff > 0 ? "#7FD69B" : diff < 0 ? "#F28B8B" : MUTED;
-  const text = diff === 0 ? `No change ${since}` : `${diff > 0 ? "Up" : "Down"} ₹${formatAmount(Math.abs(diff))} ${since}`;
+  // A small triangle as an SVG (the poster fonts have no arrow glyph) and the amount.
+  const icon = (
+    <svg width={size * 0.72} height={size * 0.72} viewBox="0 0 10 10">
+      {diff > 0 ? (
+        <path d="M5 0.5 9.5 9H0.5z" fill={tint} />
+      ) : diff < 0 ? (
+        <path d="M5 9.5 0.5 1h9z" fill={tint} />
+      ) : (
+        <rect x="0.5" y="4" width="9" height="2" fill={tint} />
+      )}
+    </svg>
+  );
   return (
     <div
       style={{
         display: "flex",
+        alignItems: "center",
+        gap: size * 0.4,
         fontFamily: "Sans",
         fontWeight: 600,
         fontSize: size,
@@ -113,7 +125,11 @@ function Change({ rate, previous, size }: { rate: GoldRate | null; previous: Gol
         background: "rgba(255,255,255,0.05)",
       }}
     >
-      {text}
+      {icon}
+      <div style={{ display: "flex", alignItems: "baseline" }}>
+        <span style={{ fontFamily: "Rupee", fontSize: size * 0.9, marginRight: size * 0.06 }}>₹</span>
+        {formatAmount(Math.abs(diff))}
+      </div>
     </div>
   );
 }

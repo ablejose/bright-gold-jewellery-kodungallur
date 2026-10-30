@@ -4,7 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { BRAND } from "@/config/brand";
 import { SharePoster } from "@/components/SharePoster";
-import { formatAmount, formatLongDate, formatRupees, formatWeekday, sinceLabel } from "@/lib/goldRate";
+import { formatAmount, formatLongDate, formatRupees, formatWeekday } from "@/lib/goldRate";
 import { adClipUrl, adLength, adThumbUrl, findMedia, mediaTitle, type RateMedia } from "@/lib/rateAds";
 import { posterFileName, posterUrl, shareMessage } from "@/lib/rateShare";
 import {
@@ -157,7 +157,6 @@ export function RateDesk({ initialRates, today, storageReady, siteUrl }: RateDes
     silver: toNumber(form.silver),
     note: form.note.trim() || undefined,
     change,
-    changeSince: previous ? sinceLabel(form.date, previous.date) : undefined,
   };
 
   // A finished video belongs to the exact form it was made from.

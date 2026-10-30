@@ -32,8 +32,6 @@ export interface StatusOverlay {
   note?: string;
   /** 22K change per gram from the previous saved day, if any. */
   change: number | null;
-  /** "since yesterday" / "since 24 Oct", shown with the change. */
-  changeSince?: string;
 }
 
 interface Fonts {
@@ -293,24 +291,43 @@ export function drawStatusFrame(
     1016,
   );
 
-  // Change since the previous rate, as a small pill under the card.
+  // Change from the previous rate: a small triangle and the amount, no words.
   if (data.change !== null) {
-    const since = data.changeSince ?? "since last rate";
-    const text =
-      data.change === 0
-        ? `No change ${since}`
-        : `${data.change > 0 ? "▲" : "▼"}  ₹${formatAmount(Math.abs(data.change))} ${since}`;
     const tint = data.change > 0 ? UP : data.change < 0 ? DOWN : MUTED;
-    ctx.font = `600 20px ${fonts.sans}`;
-    const width = ctx.measureText(text).width + 44;
-    roundRect(ctx, (W - width) / 2, 1058, width, 40, 20);
+    const text = `₹${formatAmount(Math.abs(data.change))}`;
+    ctx.font = `600 22px ${fonts.sans}`;
+    const icon = 15;
+    const gap = 9;
+    const content = icon + gap + ctx.measureText(text).width;
+    const width = content + 44;
+    roundRect(ctx, (W - width) / 2, 1056, width, 42, 21);
     ctx.fillStyle = "rgba(255,255,255,0.06)";
     ctx.fill();
     ctx.strokeStyle = tint;
     ctx.lineWidth = 1.5;
     ctx.stroke();
+
+    const left = (W - content) / 2;
+    const mid = 1077;
     ctx.fillStyle = tint;
-    ctx.fillText(text, W / 2, 1085);
+    ctx.beginPath();
+    if (data.change > 0) {
+      ctx.moveTo(left + icon / 2, mid - 7);
+      ctx.lineTo(left + icon, mid + 6);
+      ctx.lineTo(left, mid + 6);
+    } else if (data.change < 0) {
+      ctx.moveTo(left, mid - 6);
+      ctx.lineTo(left + icon, mid - 6);
+      ctx.lineTo(left + icon / 2, mid + 7);
+    } else {
+      ctx.rect(left, mid - 1.5, icon, 3);
+    }
+    ctx.closePath();
+    ctx.fill();
+
+    ctx.textAlign = "left";
+    ctx.fillText(text, left + icon + gap, 1085);
+    ctx.textAlign = "center";
   }
 
   // Other rates as evenly spaced columns.

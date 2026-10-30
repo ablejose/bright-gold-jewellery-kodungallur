@@ -50,8 +50,8 @@ export default async function AdminPage() {
 
 function AdminShell({ children }: { children: React.ReactNode }) {
   return (
-    <main className="flex min-h-screen items-center justify-center px-4 py-16">
-      <div className="w-full max-w-sm rounded-card border border-gold/25 bg-white/[0.03] p-8 shadow-2xl shadow-black/50">
+    <main className="flex min-h-[100dvh] items-center justify-center px-4 py-10 sm:py-16">
+      <div className="w-full max-w-sm rounded-card border border-gold/25 bg-white/[0.03] p-6 shadow-2xl shadow-black/50 sm:p-8">
         <p className="label-eyebrow">Rate Desk</p>
         <h1 className="mt-2 font-display text-display-m text-gold-sweep">Bright Gold</h1>
         <div className="mt-8">{children}</div>

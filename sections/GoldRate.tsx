@@ -4,6 +4,23 @@ import { formatAmount, formatLongDate, todayIST } from "@/lib/goldRate";
 import { getLatestRate, getPreviousRate } from "@/lib/rateStore";
 import { GRAMS_PER_PAVAN } from "@/types/goldRate";
 
+/** A small up / down triangle with the change in rupees, no wording. */
+function ChangeMark({ diff }: { diff: number }) {
+  const tint = diff > 0 ? "text-[#7FD69B]" : diff < 0 ? "text-[#F28B8B]" : "text-muted";
+  return (
+    <span
+      className={`inline-flex items-center gap-1 text-sm font-semibold ${tint}`}
+      role="img"
+      aria-label={diff === 0 ? "No change" : `${diff > 0 ? "Up" : "Down"} ₹${formatAmount(Math.abs(diff))}`}
+    >
+      <svg width="10" height="10" viewBox="0 0 10 10" fill="currentColor" aria-hidden="true">
+        {diff > 0 ? <path d="M5 0.5 9.5 9H0.5z" /> : diff < 0 ? <path d="M5 9.5 0.5 1h9z" /> : <rect x="0.5" y="4" width="9" height="2" />}
+      </svg>
+      {diff === 0 ? null : <span aria-hidden="true">₹{formatAmount(Math.abs(diff))}</span>}
+    </span>
+  );
+}
+
 /**
  * Today's gold rate as one small card, right under the hero. Rates come from the
  * admin desk; the section hides itself until the first rate is saved. Standard
@@ -35,7 +52,10 @@ export async function GoldRate() {
             <div className="mt-5 grid grid-cols-2 gap-4">
               <div>
                 <p className="text-caption uppercase tracking-[0.18em] text-muted">22K · 916 per gram</p>
-                <p className="mt-1.5 text-3xl font-semibold leading-none text-gold">₹{formatAmount(rate.gold22)}</p>
+                <p className="mt-1.5 flex items-center gap-2.5">
+                  <span className="text-3xl font-semibold leading-none text-gold">₹{formatAmount(rate.gold22)}</span>
+                  {diff !== null ? <ChangeMark diff={diff} /> : null}
+                </p>
               </div>
               <div>
                 <p className="text-caption uppercase tracking-[0.18em] text-muted">1 Pavan · 8g</p>
@@ -44,12 +64,6 @@ export async function GoldRate() {
                 </p>
               </div>
             </div>
-
-            {diff !== null ? (
-              <p className={`mt-4 text-sm ${diff > 0 ? "text-[#7FD69B]" : diff < 0 ? "text-[#F28B8B]" : "text-muted"}`}>
-                {diff === 0 ? "No change from previous rate" : `${diff > 0 ? "▲" : "▼"} ₹${formatAmount(Math.abs(diff))} per gram from previous rate`}
-              </p>
-            ) : null}
 
             {extras.length > 0 ? (
               <p className="mt-4 flex flex-wrap gap-x-5 gap-y-1 border-t border-border pt-4 text-sm text-muted">

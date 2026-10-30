@@ -3,7 +3,7 @@ import { formatLongDate, formatRupees } from "@/lib/goldRate";
 import { GRAMS_PER_PAVAN, type GoldRate } from "@/types/goldRate";
 
 /** Bump when the poster design changes, so cached old posters are not reused. */
-const POSTER_DESIGN = "3";
+const POSTER_DESIGN = "4";
 
 /** Versioned poster URL: changes whenever the day's rate is re-saved. */
 export function posterUrl(rate: GoldRate, format: "story" | "square" = "story"): string {

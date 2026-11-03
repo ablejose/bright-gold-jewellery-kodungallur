@@ -9,11 +9,11 @@ function ChangeMark({ diff }: { diff: number }) {
   const tint = diff > 0 ? "text-[#7FD69B]" : diff < 0 ? "text-[#F28B8B]" : "text-muted";
   return (
     <span
-      className={`inline-flex items-center gap-1 text-sm font-semibold ${tint}`}
+      className={`inline-flex items-center gap-2 text-3xl font-semibold leading-none ${tint}`}
       role="img"
       aria-label={diff === 0 ? "No change" : `${diff > 0 ? "Up" : "Down"} ₹${formatAmount(Math.abs(diff))}`}
     >
-      <svg width="10" height="10" viewBox="0 0 10 10" fill="currentColor" aria-hidden="true">
+      <svg className="h-[0.62em] w-[0.62em]" viewBox="0 0 10 10" fill="currentColor" aria-hidden="true">
         {diff > 0 ? <path d="M5 0.5 9.5 9H0.5z" /> : diff < 0 ? <path d="M5 9.5 0.5 1h9z" /> : <rect x="0.5" y="4" width="9" height="2" />}
       </svg>
       {diff === 0 ? null : <span aria-hidden="true">₹{formatAmount(Math.abs(diff))}</span>}
@@ -21,7 +21,7 @@ function ChangeMark({ diff }: { diff: number }) {
   );
 }
 
-/** One price with its change beside it; wraps under the price rather than touching the card edge. */
+/** One price with its change on the line below, at the same size, so both columns line up. */
 function Price({
   label,
   amount,
@@ -38,10 +38,12 @@ function Price({
   return (
     <div className={`min-w-0 ${divided ? "border-t border-border pt-4 sm:border-t-0 sm:pt-0" : ""}`}>
       <p className="text-caption uppercase tracking-[0.18em] text-muted">{label}</p>
-      <p className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1">
-        <span className={`text-3xl font-semibold leading-none ${tone}`}>₹{formatAmount(amount)}</span>
-        {diff !== null ? <ChangeMark diff={diff} /> : null}
-      </p>
+      <p className={`mt-1.5 text-3xl font-semibold leading-none ${tone}`}>₹{formatAmount(amount)}</p>
+      {diff !== null ? (
+        <p className="mt-2.5">
+          <ChangeMark diff={diff} />
+        </p>
+      ) : null}
     </div>
   );
 }

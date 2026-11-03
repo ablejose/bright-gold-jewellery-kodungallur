@@ -295,12 +295,12 @@ export function drawStatusFrame(
   if (data.change !== null) {
     const tint = data.change > 0 ? UP : data.change < 0 ? DOWN : MUTED;
     const text = `₹${formatAmount(Math.abs(data.change))}`;
-    ctx.font = `600 22px ${fonts.sans}`;
-    const icon = 15;
-    const gap = 9;
+    ctx.font = `600 27px ${fonts.sans}`;
+    const icon = 19;
+    const gap = 11;
     const content = icon + gap + ctx.measureText(text).width;
-    const width = content + 44;
-    roundRect(ctx, (W - width) / 2, 1056, width, 42, 21);
+    const width = content + 52;
+    roundRect(ctx, (W - width) / 2, 1052, width, 52, 26);
     ctx.fillStyle = "rgba(255,255,255,0.06)";
     ctx.fill();
     ctx.strokeStyle = tint;
@@ -308,25 +308,25 @@ export function drawStatusFrame(
     ctx.stroke();
 
     const left = (W - content) / 2;
-    const mid = 1077;
+    const mid = 1078;
     ctx.fillStyle = tint;
     ctx.beginPath();
     if (data.change > 0) {
-      ctx.moveTo(left + icon / 2, mid - 7);
-      ctx.lineTo(left + icon, mid + 6);
-      ctx.lineTo(left, mid + 6);
+      ctx.moveTo(left + icon / 2, mid - 9);
+      ctx.lineTo(left + icon, mid + 8);
+      ctx.lineTo(left, mid + 8);
     } else if (data.change < 0) {
-      ctx.moveTo(left, mid - 6);
-      ctx.lineTo(left + icon, mid - 6);
-      ctx.lineTo(left + icon / 2, mid + 7);
+      ctx.moveTo(left, mid - 8);
+      ctx.lineTo(left + icon, mid - 8);
+      ctx.lineTo(left + icon / 2, mid + 9);
     } else {
-      ctx.rect(left, mid - 1.5, icon, 3);
+      ctx.rect(left, mid - 2, icon, 4);
     }
     ctx.closePath();
     ctx.fill();
 
     ctx.textAlign = "left";
-    ctx.fillText(text, left + icon + gap, 1085);
+    ctx.fillText(text, left + icon + gap, 1087);
     ctx.textAlign = "center";
   }
 

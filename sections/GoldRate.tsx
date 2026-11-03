@@ -9,7 +9,7 @@ function ChangeMark({ diff }: { diff: number }) {
   const tint = diff > 0 ? "text-[#7FD69B]" : diff < 0 ? "text-[#F28B8B]" : "text-muted";
   return (
     <span
-      className={`inline-flex items-center gap-2 text-3xl font-semibold leading-none ${tint}`}
+      className={`inline-flex items-center gap-1.5 text-2xl font-semibold leading-none ${tint}`}
       role="img"
       aria-label={diff === 0 ? "No change" : `${diff > 0 ? "Up" : "Down"} ₹${formatAmount(Math.abs(diff))}`}
     >
@@ -21,7 +21,7 @@ function ChangeMark({ diff }: { diff: number }) {
   );
 }
 
-/** One price with its change on the line below, at the same size, so both columns line up. */
+/** One price with its change on the line below (80% of the price's size), so both columns line up. */
 function Price({
   label,
   amount,
@@ -40,7 +40,7 @@ function Price({
       <p className="text-caption uppercase tracking-[0.18em] text-muted">{label}</p>
       <p className={`mt-1.5 text-3xl font-semibold leading-none ${tone}`}>₹{formatAmount(amount)}</p>
       {diff !== null ? (
-        <p className="mt-2.5">
+        <p className="mt-2">
           <ChangeMark diff={diff} />
         </p>
       ) : null}

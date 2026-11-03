@@ -263,7 +263,7 @@ function Poster({
         </div>
 
         <div style={{ display: "flex", marginTop: story ? 30 : 30 }}>
-          <Change rate={rate} previous={previous} size={story ? 28 : 22} />
+          <Change rate={rate} previous={previous} size={story ? 34 : 27} />
         </div>
 
         {others.length > 0 && story ? (

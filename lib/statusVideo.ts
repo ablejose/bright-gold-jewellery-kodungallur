@@ -2,7 +2,7 @@
 
 import { BRAND } from "@/config/brand";
 import { displayPhone } from "@/lib/format";
-import { formatAmount, formatFullDate } from "@/lib/goldRate";
+import { formatAmount, formatFullDate, formatShortDate } from "@/lib/goldRate";
 import { PHOTO_HEIGHT, STATUS_HEIGHT as H, STATUS_WIDTH as W } from "@/lib/rateAds";
 import { GRAMS_PER_PAVAN } from "@/types/goldRate";
 
@@ -32,6 +32,8 @@ export interface StatusOverlay {
   note?: string;
   /** 22K change per gram from the previous saved day, if any. */
   change: number | null;
+  /** Date (YYYY-MM-DD) of the previous saved rate the change is measured from. */
+  changeFrom?: string;
 }
 
 interface Fonts {
@@ -246,7 +248,7 @@ export function drawStatusFrame(
 
   // 22K card.
   const cardTop = 774;
-  const cardHeight = 264;
+  const cardHeight = 256;
   const card = ctx.createLinearGradient(0, cardTop, 0, cardTop + cardHeight);
   card.addColorStop(0, "rgba(242,210,139,0.18)");
   card.addColorStop(1, "rgba(169,121,31,0.07)");
@@ -280,7 +282,7 @@ export function drawStatusFrame(
   ctx.fillText("per gram", W / 2, 956);
 
   ctx.fillStyle = "rgba(242,210,139,0.3)";
-  ctx.fillRect(150, 982, W - 300, 1);
+  ctx.fillRect(150, 978, W - 300, 1);
 
   runs(
     ctx,
@@ -288,19 +290,25 @@ export function drawStatusFrame(
       { text: `1 Pavan (${GRAMS_PER_PAVAN} g)`, font: `500 22px ${fonts.sans}`, color: MUTED, gap: 16 },
       { text: `₹${formatAmount(data.gold22 * GRAMS_PER_PAVAN)}`, font: `700 27px ${fonts.sans}`, color: IVORY },
     ],
-    1016,
+    1010,
   );
 
-  // Change from the previous rate: a small triangle and the amount, no words.
+  // Change from the previous rate: a small triangle, the amount and, small, the date it is
+  // measured from. 22 px of air above and below the pill.
   if (data.change !== null) {
     const tint = data.change > 0 ? UP : data.change < 0 ? DOWN : MUTED;
     const text = `₹${formatAmount(Math.abs(data.change))}`;
     ctx.font = `600 33px ${fonts.sans}`;
     const icon = 22;
     const gap = 13;
-    const content = icon + gap + ctx.measureText(text).width;
+    const amountWidth = ctx.measureText(text).width;
+    const dateText = data.changeFrom ? formatShortDate(data.changeFrom) : "";
+    ctx.font = `500 20px ${fonts.sans}`;
+    const dateWidth = dateText ? ctx.measureText(dateText).width : 0;
+    const dateBlock = dateText ? 18 + 1 + 18 + dateWidth : 0;
+    const content = icon + gap + amountWidth + dateBlock;
     const width = content + 62;
-    roundRect(ctx, (W - width) / 2, 1044, width, 62, 31);
+    roundRect(ctx, (W - width) / 2, 1052, width, 56, 28);
     ctx.fillStyle = "rgba(255,255,255,0.06)";
     ctx.fill();
     ctx.strokeStyle = tint;
@@ -308,7 +316,7 @@ export function drawStatusFrame(
     ctx.stroke();
 
     const left = (W - content) / 2;
-    const mid = 1075;
+    const mid = 1080;
     ctx.fillStyle = tint;
     ctx.beginPath();
     if (data.change > 0) {
@@ -326,7 +334,16 @@ export function drawStatusFrame(
     ctx.fill();
 
     ctx.textAlign = "left";
-    ctx.fillText(text, left + icon + gap, 1087);
+    ctx.font = `600 33px ${fonts.sans}`;
+    ctx.fillText(text, left + icon + gap, mid + 12);
+    if (dateText) {
+      const divider = left + icon + gap + amountWidth + 18;
+      ctx.fillStyle = "rgba(255,255,255,0.28)";
+      ctx.fillRect(divider, mid - 11, 1, 22);
+      ctx.fillStyle = MUTED;
+      ctx.font = `500 20px ${fonts.sans}`;
+      ctx.fillText(dateText, divider + 1 + 18, mid + 7);
+    }
     ctx.textAlign = "center";
   }
 
@@ -342,23 +359,23 @@ export function drawStatusFrame(
     const x = W / 2 + (index - (others.length - 1) / 2) * 200;
     ctx.fillStyle = MUTED;
     ctx.font = `600 15px ${fonts.sans}`;
-    ctx.fillText(label, x, 1136);
+    ctx.fillText(label, x, 1142);
     ctx.fillStyle = IVORY;
     ctx.font = `600 26px ${fonts.sans}`;
-    ctx.fillText(`₹${formatAmount(value as number)}`, x, 1168);
+    ctx.fillText(`₹${formatAmount(value as number)}`, x, 1172);
   });
 
   ctx.fillStyle = "rgba(242,210,139,0.25)";
-  ctx.fillRect(120, 1188, W - 240, 1);
+  ctx.fillRect(120, 1192, W - 240, 1);
   const phones = [BRAND.phone, BRAND.phone2].filter(Boolean).map((phone) => displayPhone(phone as string));
   ctx.fillStyle = IVORY;
   ctx.font = `600 22px ${fonts.sans}`;
-  ctx.fillText(phones.join("     ·     "), W / 2, 1218);
+  ctx.fillText(phones.join("     ·     "), W / 2, 1222);
   // Addresses: one line each, stacked, with the same breathing room as the rest.
   ctx.fillStyle = MUTED;
   ctx.font = `400 16px ${fonts.sans}`;
   BRAND.ratePoster.addressLines.forEach((line, index) => {
-    ctx.fillText(line, W / 2, 1248 + index * 26, W - 80);
+    ctx.fillText(line, W / 2, 1252 + index * 26, W - 80);
   });
   ctx.restore();
 

@@ -163,6 +163,7 @@ export function RateDesk({ initialRates, today, storageReady, siteUrl }: RateDes
     silver: toNumber(form.silver),
     note: form.note.trim() || undefined,
     change,
+    changeFrom: previous?.date,
   };
 
   // A finished video belongs to the exact form it was made from.

@@ -1,7 +1,7 @@
 import { ImageResponse } from "next/og";
 import { BRAND } from "@/config/brand";
 import { displayPhone } from "@/lib/format";
-import { formatAmount, formatFullDate, formatShortDate, isIsoDate, todayIST } from "@/lib/goldRate";
+import { formatAmount, formatFullDate, isIsoDate, todayIST } from "@/lib/goldRate";
 import { GRAMS_PER_PAVAN, type GoldRate } from "@/types/goldRate";
 
 /**
@@ -130,8 +130,6 @@ function Change({ rate, previous, size }: { rate: GoldRate | null; previous: Gol
         <span style={{ fontFamily: "Rupee", fontSize: size * 0.9, marginRight: size * 0.06 }}>₹</span>
         {formatAmount(Math.abs(diff))}
       </div>
-      <div style={{ display: "flex", width: 2, height: size * 0.7, background: "rgba(255,255,255,0.28)", marginLeft: size * 0.1 }} />
-      <span style={{ display: "flex", fontWeight: 500, fontSize: size * 0.6, color: MUTED }}>{formatShortDate(previous.date)}</span>
     </div>
   );
 }

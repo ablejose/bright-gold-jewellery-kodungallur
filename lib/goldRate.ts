@@ -24,13 +24,6 @@ export function formatLongDate(date: string): string {
   }).format(new Date(`${date}T00:00:00Z`));
 }
 
-/** "27 Oct" from YYYY-MM-DD. */
-export function formatShortDate(date: string): string {
-  return new Intl.DateTimeFormat("en-IN", { day: "numeric", month: "short", timeZone: "UTC" }).format(
-    new Date(`${date}T00:00:00Z`),
-  );
-}
-
 /** "Tuesday" from YYYY-MM-DD. */
 export function formatWeekday(date: string): string {
   return new Intl.DateTimeFormat("en-IN", { weekday: "long", timeZone: "UTC" }).format(

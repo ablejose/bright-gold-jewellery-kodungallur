@@ -2,7 +2,7 @@
 
 import { BRAND } from "@/config/brand";
 import { displayPhone } from "@/lib/format";
-import { formatAmount, formatFullDate, formatShortDate } from "@/lib/goldRate";
+import { formatAmount, formatFullDate } from "@/lib/goldRate";
 import { PHOTO_HEIGHT, STATUS_HEIGHT as H, STATUS_WIDTH as W } from "@/lib/rateAds";
 import { GRAMS_PER_PAVAN } from "@/types/goldRate";
 
@@ -32,8 +32,6 @@ export interface StatusOverlay {
   note?: string;
   /** 22K change per gram from the previous saved day, if any. */
   change: number | null;
-  /** Date (YYYY-MM-DD) of the previous saved rate the change is measured from. */
-  changeFrom?: string;
 }
 
 interface Fonts {
@@ -293,20 +291,15 @@ export function drawStatusFrame(
     1010,
   );
 
-  // Change from the previous rate: a small triangle, the amount and, small, the date it is
-  // measured from. 22 px of air above and below the pill.
+  // Change from the previous rate: a small triangle and the amount, no words and no date
+  // (the rate can change more than once a day). 22 px of air above and below the pill.
   if (data.change !== null) {
     const tint = data.change > 0 ? UP : data.change < 0 ? DOWN : MUTED;
     const text = `₹${formatAmount(Math.abs(data.change))}`;
     ctx.font = `600 33px ${fonts.sans}`;
     const icon = 22;
     const gap = 13;
-    const amountWidth = ctx.measureText(text).width;
-    const dateText = data.changeFrom ? formatShortDate(data.changeFrom) : "";
-    ctx.font = `500 20px ${fonts.sans}`;
-    const dateWidth = dateText ? ctx.measureText(dateText).width : 0;
-    const dateBlock = dateText ? 18 + 1 + 18 + dateWidth : 0;
-    const content = icon + gap + amountWidth + dateBlock;
+    const content = icon + gap + ctx.measureText(text).width;
     const width = content + 62;
     roundRect(ctx, (W - width) / 2, 1052, width, 56, 28);
     ctx.fillStyle = "rgba(255,255,255,0.06)";
@@ -336,14 +329,6 @@ export function drawStatusFrame(
     ctx.textAlign = "left";
     ctx.font = `600 33px ${fonts.sans}`;
     ctx.fillText(text, left + icon + gap, mid + 12);
-    if (dateText) {
-      const divider = left + icon + gap + amountWidth + 18;
-      ctx.fillStyle = "rgba(255,255,255,0.28)";
-      ctx.fillRect(divider, mid - 11, 1, 22);
-      ctx.fillStyle = MUTED;
-      ctx.font = `500 20px ${fonts.sans}`;
-      ctx.fillText(dateText, divider + 1 + 18, mid + 7);
-    }
     ctx.textAlign = "center";
   }
 
